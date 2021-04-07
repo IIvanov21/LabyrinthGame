@@ -1,3 +1,8 @@
+# Folders
+Labyrinth/.vs
+Labyrinth/Binaries
+Labyrinth/Intermediate
+Labyrinth/Saved
 # Prerequisites
 *.d
 
