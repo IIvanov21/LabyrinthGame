@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include "Components/SceneCaptureComponent2D.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "UnrealSFASCharacter.generated.h"
-
 UCLASS(config=Game)
 class AUnrealSFASCharacter : public ACharacter
 {
@@ -21,11 +21,10 @@ class AUnrealSFASCharacter : public ACharacter
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class USpringArmComponent* MiniMapSpringArm;
+		USpringArmComponent* MiniMapSpringArm;
 
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-		class UCameraComponent* MiniMapCamera;
+	UPROPERTY(EditAnywhere)
+		USceneCaptureComponent2D* MiniMapCamera;
 public:
 	AUnrealSFASCharacter();
 
