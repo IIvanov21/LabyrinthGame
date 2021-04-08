@@ -25,9 +25,14 @@ class AUnrealSFASCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere)
 		USceneCaptureComponent2D* MiniMapCamera;
+	UPROPERTY(EditAnywhere)
+		bool IsKeyCollected;
 public:
 	AUnrealSFASCharacter();
-
+	UFUNCTION()
+		void SetDoorKeyState() { IsKeyCollected = true; }
+	UFUNCTION()
+		bool GetDoorKeyState() { return IsKeyCollected; }
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;

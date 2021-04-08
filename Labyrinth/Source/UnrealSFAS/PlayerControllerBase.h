@@ -9,6 +9,7 @@
 
 class UScoreUserWidget;
 class UTimeUserWidget;
+class UKeyUserWidget;
 /**
  * 
  */
@@ -21,11 +22,19 @@ public:
 	virtual void BeginPlay() override;
 	void SetScore(int Points);
 	void  SetTimer(int timeIn);
+	void SetKey();
 private:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> MinimapClass;
 	UPROPERTY(EditAnywhere)
 		UUserWidget* MinimapUI;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UUserWidget> KeyClass;
+	UPROPERTY(EditAnywhere)
+		UUserWidget* KeyUI;
+	UPROPERTY(EditAnywhere)
+		UKeyUserWidget* KeySet;
 	
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> TimeClass;

@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ScoreUserWidget.h"
 #include "TimeUserWidget.h"
+#include "KeyUserWidget.h"
 
 void APlayerControllerBase::BeginPlay()
 {
@@ -17,13 +18,17 @@ void APlayerControllerBase::BeginPlay()
 	
 	ScoreUI = CreateWidget(this, ScoreClass);
 	if (ScoreUI != nullptr)ScoreUI->AddToViewport();
+	ScoreText = Cast<UScoreUserWidget>(ScoreUI);
+	SetScore(0);
 
 	TimeUI = CreateWidget(this, TimeClass);
 	if (TimeUI != nullptr)TimeUI->AddToViewport();
 	TimeText = Cast<UTimeUserWidget>(TimeUI);
 
-	ScoreText = Cast<UScoreUserWidget>(ScoreUI);
-	SetScore(0);
+	KeyUI = CreateWidget(this, KeyClass);
+	if (KeyUI != nullptr)KeyUI->AddToViewport();
+	KeySet = Cast<UKeyUserWidget>(KeyUI);
+	
 
 }
 
@@ -39,4 +44,9 @@ void APlayerControllerBase::SetScore(int Points)
 void APlayerControllerBase::SetTimer(int timeIn)
 {
 	TimeText->GetTimer(timeIn);
+}
+
+void APlayerControllerBase::SetKey()
+{
+	KeySet->KeyCollected();
 }
