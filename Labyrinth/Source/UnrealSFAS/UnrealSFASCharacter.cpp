@@ -82,6 +82,8 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AUnrealSFASCharacter::OnResetVR);
+
+	PlayerInputComponent->BindAction("ShowPlayerPos", IE_Pressed, this, &AUnrealSFASCharacter::ShowPlayerCoordinates);
 }
 
 
@@ -139,4 +141,9 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+void AUnrealSFASCharacter::ShowPlayerCoordinates()
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Player position: %d %f %s"),GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+
 }

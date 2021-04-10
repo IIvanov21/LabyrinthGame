@@ -3,14 +3,15 @@
 
 #include "DoorActor.h"
 #include "UnrealSFASCharacter.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+
 // Sets default values
 ADoorActor::ADoorActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	IsKeyCollected = false;
-	DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Door Mesh"));
+	DoorMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Door Mesh"));
 	SetRootComponent(DoorMesh);
 	DoorMesh->SetupAttachment(RootComponent);
 }
@@ -19,8 +20,8 @@ ADoorActor::ADoorActor()
 void ADoorActor::BeginPlay()
 {
 	Super::BeginPlay();
-	DoorMesh->OnComponentBeginOverlap.AddDynamic(this, &ADoorActor::OnOverlapBegin);
-	DoorMesh->OnComponentEndOverlap.AddDynamic(this, &ADoorActor::OnOverlapEnd);
+	DoorMesh->OnComponentHit.AddDynamic(this, &ADoorActor::OnCompHit);
+	
 }
 
 // Called every frame
@@ -30,27 +31,20 @@ void ADoorActor::Tick(float DeltaTime)
 
 }
 
-void ADoorActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor->GetClass()->IsChildOf(AUnrealSFASCharacter::StaticClass()) )
-	{
-		AUnrealSFASCharacter* Player = Cast<AUnrealSFASCharacter>(OtherActor);
-		IsKeyCollected=Player->GetDoorKeyState();
-		if (IsKeyCollected)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Door Opened!"));
-			Destroy();
-		}
-		else UE_LOG(LogTemp, Warning, TEXT("Key needed"));
-	}
-}
 
 
-void ADoorActor::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ADoorActor::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (OtherActor->GetClass()->IsChildOf(AUnrealSFASCharacter::StaticClass()))
 	{
-		/*Place holder code for now!*/
+		AUnrealSFASCharacter* Player = Cast<AUnrealSFASCharacter>(OtherActor);
+		IsKeyCollected = Player->GetDoorKeyState();
+		if (IsKeyCollected)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Door Opened!"));
+			DoorMesh->Play(false);
+		}
+		else UE_LOG(LogTemp, Warning, TEXT("Key needed"));
 	}
 }
 
