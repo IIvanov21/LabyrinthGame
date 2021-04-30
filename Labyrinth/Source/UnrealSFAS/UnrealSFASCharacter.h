@@ -6,6 +6,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "UnrealSFASCharacter.generated.h"
+class UAnimInstanceBase;
+
+UENUM()
+enum PlayerMovementState
+{
+	Idle UMETA(DisplayName = "Idle"),
+	Walking UMETA(DisplayName = "Walking"),
+	Interaction UMETA(DisplayName = "Interact"),
+};
+
 UCLASS(config=Game)
 class AUnrealSFASCharacter : public ACharacter
 {
@@ -22,12 +32,19 @@ class AUnrealSFASCharacter : public ACharacter
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 		USpringArmComponent* MiniMapSpringArm;
-
+	
 	UPROPERTY(EditAnywhere)
 		USceneCaptureComponent2D* MiniMapCamera;
 	UPROPERTY(EditAnywhere)
 		bool IsKeyCollected;
+	UPROPERTY(EditAnywhere)
+		UAnimInstanceBase* AnimationUpdate;
+	UPROPERTY(EditAnywhere)
+		bool Interacted = false;
+	UPROPERTY(EditAnywhere)
+		bool IsPlayed = false;
 public:
+	
 	AUnrealSFASCharacter();
 	UFUNCTION()
 		void SetDoorKeyState() { IsKeyCollected = true; }
@@ -41,11 +58,33 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UFUNCTION()
+		void Interact();
+
+	UFUNCTION()
+		void MoveInteractionPressed();
+	UFUNCTION()
+		void MoveInteractionReleased();
+	UFUNCTION()
+		void PlayPushPull(float Value);
+	UFUNCTION()
+		void PushActorForwards(float Value);
+	UFUNCTION()
+		void PushActorRight(float Value);
+	UPROPERTY()
+		AActor* InteractedActor;
+private:
+	PlayerMovementState PlayerMovement;
+
 protected:
+
+	//// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
 
+	
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
 
@@ -73,6 +112,8 @@ protected:
 
 	/*Show Player coordinates*/
 	void ShowPlayerCoordinates();
+
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -83,5 +124,11 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+	
+	virtual void Landed(const FHitResult& Hit) override;
 };
 

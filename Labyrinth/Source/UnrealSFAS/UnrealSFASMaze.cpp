@@ -21,8 +21,9 @@ void AUnrealSFASMaze::BeginPlay()
 		const int32 mazeSize = 20;
 		const float blockSize = 200.0f;
 		const float blockWidth = 2.0f;
-		const float blockHeight = 5.0f;
+		const float blockHeight = 3.0f;
 		const float blockZPos = 50.0f;
+	
 
 		// Array of binary values: 1 = wall, 0 = space
 		uint32 mazeArray[mazeSize] = {	0b11111111111111111111,

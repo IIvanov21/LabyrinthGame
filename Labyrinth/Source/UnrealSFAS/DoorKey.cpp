@@ -34,7 +34,8 @@ void ADoorKey::BeginPlay()
 void ADoorKey::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	FRotator KeyRotator = FRotator(0.0f, 2.0f, 0.0f);
+	KeyMesh->AddLocalRotation(KeyRotator);
 }
 
 

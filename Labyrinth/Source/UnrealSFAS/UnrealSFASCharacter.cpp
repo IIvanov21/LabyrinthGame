@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "UnrealSFASCharacter.h"
+
+#include "AnimInstanceBase.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -8,8 +10,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Components/SceneCaptureComponent2D.h"
-
+#include "PushActor.h"
 //////////////////////////////////////////////////////////////////////////
 // AUnrealSFASCharacter
 
@@ -50,9 +53,10 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 	//Create Minimap camera
 	MiniMapCamera = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("Minimap Camera"));
 	MiniMapCamera->SetupAttachment(MiniMapSpringArm);
-
+	PlayerMovement = Walking;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -62,9 +66,12 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AUnrealSFASCharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AUnrealSFASCharacter::StopJumping);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AUnrealSFASCharacter::Interact);
+	PlayerInputComponent->BindAction("PressedMove", IE_Pressed, this, &AUnrealSFASCharacter::MoveInteractionPressed);
+	PlayerInputComponent->BindAction("PressedMove", IE_Released,this, &AUnrealSFASCharacter::MoveInteractionReleased);
+	
 	PlayerInputComponent->BindAxis("MoveForward", this, &AUnrealSFASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AUnrealSFASCharacter::MoveRight);
 
@@ -86,20 +93,163 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("ShowPlayerPos", IE_Pressed, this, &AUnrealSFASCharacter::ShowPlayerCoordinates);
 }
 
+void AUnrealSFASCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	AnimationUpdate = Cast<UAnimInstanceBase>(GetMesh()->GetAnimInstance());
+
+
+}
+
+void AUnrealSFASCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (PlayerMovement==Interaction)
+	{
+		
+	}
+}
+
+void AUnrealSFASCharacter::Jump()
+{
+	Super::Jump();
+	AnimationUpdate->SetJumpTrue();
+}
+
+void AUnrealSFASCharacter::StopJumping()
+{
+	Super::StopJumping();
+}
+
+
+
+void AUnrealSFASCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	AnimationUpdate->SetJumpFalse();
+	
+}
+
+
+
+void AUnrealSFASCharacter::MoveInteractionPressed()
+{
+	if (Interacted)
+	{
+		AnimationUpdate->PlayAnimation("Pull", Resume);
+		
+		//InteractedActor->SetActorLocation(GetActorForwardVector()*5.0f );
+	
+	}
+}
+
+void AUnrealSFASCharacter::MoveInteractionReleased()
+{
+	if (Interacted)
+	{
+		AnimationUpdate->PlayAnimation("Pull", Pause);
+	}
+}
+
+void AUnrealSFASCharacter::PlayPushPull(float Value)
+{
+	if (Interacted)
+	{
+		if(Value ==0)AnimationUpdate->PlayAnimation("Pull", Play);
+		if (Value > 0.0f)
+		{
+			AnimationUpdate->SetPush(true);
+			AnimationUpdate->SetWalk(false);
+			AnimationUpdate->PlayAnimation("Pull", Stop);
+		}
+		else if (Value < 0.0f)
+		{
+			AnimationUpdate->SetPush(false);
+			AnimationUpdate->SetWalk(false);
+			AnimationUpdate->PlayAnimation("Pull", Play);
+
+		}
+
+
+	}
+	else
+	{
+		AnimationUpdate->SetWalk(true);
+		AnimationUpdate->SetPush(false);
+	}
+}
+
+void AUnrealSFASCharacter::PushActorForwards(float Value)
+{
+	float CastRange = 50.0f;
+	float DistanceToActor = GetDistanceTo(InteractedActor);
+	if(DistanceToActor>1.0f)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Distance is greater!"));
+		FString ActorName = InteractedActor->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("Hit something: %s"), *ActorName);
+		InteractedActor->AddActorWorldOffset(GetActorForwardVector()*5.0f);
+	}
+}
+
+void AUnrealSFASCharacter::PushActorRight(float Value)
+{
+	float CastRange = 50.0f;
+	float DistanceToActor = GetDistanceTo(InteractedActor);
+	
+}
+void AUnrealSFASCharacter::Interact()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Pressing Interact."));
+	
+	float CastRange = 50.0f;
+	FVector EndPoint = GetActorLocation() + GetActorRotation().Vector() * CastRange;
+	FHitResult Hit;
+	bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
+	if(ObjectInRange)
+	{
+		if(Hit.GetActor()->ActorHasTag("Interact"))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("You can interact with this actor."));
+			Interacted = !Interacted;
+			PlayPushPull(0);
+			InteractedActor = Hit.GetActor();
+			//GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+			GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f); // ...at this rotation rate
+			InteractedActor->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			//InteractedActor->DisableComponentsSimulatePhysics();
+			PlayerMovement = Interaction;
+
+			//UE_LOG(LogTemp, Warning, TEXT("Actor Root attached!"));
+		}
+	}
+	else
+	{
+		Interacted = false;
+		AnimationUpdate->PlayAnimation("Pull", Stop);
+		//GetCharacterMovement()->bOrientRotationToMovement = true; 	
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+	}
+}
+
+
 
 void AUnrealSFASCharacter::OnResetVR()
 {
 	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
+
+
 void AUnrealSFASCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void AUnrealSFASCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
+
 }
 
 void AUnrealSFASCharacter::TurnAtRate(float Rate)
@@ -116,30 +266,54 @@ void AUnrealSFASCharacter::LookUpAtRate(float Rate)
 
 void AUnrealSFASCharacter::MoveForward(float Value)
 {
-	if ((Controller != NULL) && (Value != 0.0f))
+	if (PlayerMovement == Walking)
 	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get forward vector
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		if ((Controller != NULL) && (Value != 0.0f))
+		{
+			// find out which way is forward
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+			// get forward vector
+			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+			AddMovementInput(Direction, Value);
+			PlayPushPull(Value);
+
+		}
 	}
+	else if(PlayerMovement== Interaction)
+	{
+		//PushActorForwards(Value);
+
+		AddMovementInput(GetActorForwardVector() ,Value);
+
+	}
+	
+		
+	
+	
 }
 
 void AUnrealSFASCharacter::MoveRight(float Value)
 {
-	if ( (Controller != NULL) && (Value != 0.0f) )
+	if (PlayerMovement == Walking)
 	{
-		// find out which way is right
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-	
-		// get right vector 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
-		AddMovementInput(Direction, Value);
+		if ((Controller != NULL) && (Value != 0.0f) && !Interacted)
+		{
+			// find out which way is right
+			const FRotator Rotation = Controller->GetControlRotation();
+			const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+			// get right vector 
+			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+			// add movement in that direction
+			AddMovementInput(Direction, Value);
+		}
+	}
+	else if(Interacted)
+	{
+		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 void AUnrealSFASCharacter::ShowPlayerCoordinates()
