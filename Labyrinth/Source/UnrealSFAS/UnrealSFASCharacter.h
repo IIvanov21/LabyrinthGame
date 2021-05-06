@@ -40,16 +40,18 @@ class AUnrealSFASCharacter : public ACharacter
 	UPROPERTY(EditAnywhere)
 		UAnimInstanceBase* AnimationUpdate;
 	UPROPERTY(EditAnywhere)
-		bool Interacted = false;
+		bool MovingForwards = true;
+	UPROPERTY(EditAnywhere)
+		bool MovingRight = true;
 	UPROPERTY(EditAnywhere)
 		bool IsPlayed = false;
 public:
 	
 	AUnrealSFASCharacter();
 	UFUNCTION()
-		void SetDoorKeyState() { IsKeyCollected = true; }
+		 void SetDoorKeyState() { IsKeyCollected = true; }
 	UFUNCTION()
-		bool GetDoorKeyState() { return IsKeyCollected; }
+		 bool GetDoorKeyState() { return IsKeyCollected; }
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -71,8 +73,10 @@ public:
 		void PushActorForwards(float Value);
 	UFUNCTION()
 		void PushActorRight(float Value);
+	UFUNCTION()
+		void UpdateInteraction();
 	UPROPERTY()
-		AActor* InteractedActor;
+		APawn* InteractedActor;
 private:
 	PlayerMovementState PlayerMovement;
 

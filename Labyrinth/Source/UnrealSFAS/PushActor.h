@@ -7,7 +7,7 @@
 #include "PushActor.generated.h"
 class UStaticMeshComponent;
 UCLASS()
-class UNREALSFAS_API APushActor : public AActor
+class UNREALSFAS_API APushActor : public APawn
 {
 	GENERATED_BODY()
 	
@@ -23,5 +23,10 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION()
+		FRotator GetOrientation(FVector ActorLocation);
+	UFUNCTION()
+		FVector GetLocation(FVector ActorLocation);
 
 };

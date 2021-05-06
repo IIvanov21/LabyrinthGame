@@ -68,24 +68,47 @@ void UAnimInstanceBase::PlayAnimation(FName Animation, AnimationState State)
 		{
 			
 			UE_LOG(LogTemp, Warning, TEXT("Playing Pull Anim!"));
-			if(!Montage_IsActive(PullMontage))Montage_Play(PullMontage);
+			if (Montage_GetCurrentSection(PullMontage) == "Loop")
+			{
+				State = Pause;
+				IsPushing = true;
+			}
+			if (!Montage_IsActive(PullMontage))
+			{
+				Montage_Play(PullMontage);
+				IsPushing = false;
+			}
 		}
-		else if (Animation == "Push")Montage_Play(PushMontage);
+		else if (PushMontage != nullptr && Animation == "Push")
+		{
+
+			UE_LOG(LogTemp, Warning, TEXT("Playing Push Anim!"));
+			if (Montage_GetCurrentSection(PushMontage) == "Loop")
+			{
+				IsPushing = true;
+				State = Pause;
+			}
+			if (!Montage_IsActive(PushMontage))
+			{
+				IsPushing = false;
+				Montage_Play(PushMontage);
+			}
+		}
 	}
 	else if (State == AnimationState::Pause)
 	{
 		if (PullMontage!=nullptr && Animation == "Pull" && Montage_GetCurrentSection(PullMontage)== "Loop")Montage_Pause(PullMontage);
-		else if (Animation == "Push")Montage_Pause(PushMontage);
+		else if (PushMontage != nullptr && Animation == "Push" && Montage_GetCurrentSection(PushMontage) == "Loop")Montage_Pause(PushMontage);
 		
 	}
 	else if (State == AnimationState::Resume)
 	{
 		if (PullMontage != nullptr && Animation == "Pull" && Montage_GetCurrentSection(PullMontage) == "Loop")Montage_Resume( PullMontage);
-		else if (Animation == "Push")Montage_Resume(PushMontage);
+		else if (PushMontage != nullptr && Animation == "Push" && Montage_GetCurrentSection(PushMontage) == "Loop")Montage_Resume(PushMontage);
 	}
 	else if (State == AnimationState::Stop)
 	{
 		if (PullMontage != nullptr && Animation == "Pull")Montage_Stop(0.25f,PullMontage);
-		else if (Animation == "Push")Montage_Stop(0.25,PushMontage);
+		else if (PushMontage != nullptr && Animation == "Push")Montage_Stop(0.25f, PushMontage);
 	}
 }
