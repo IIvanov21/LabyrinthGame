@@ -33,7 +33,6 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -97,6 +96,7 @@ void AUnrealSFASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	AnimationUpdate = Cast<UAnimInstanceBase>(GetMesh()->GetAnimInstance());
+	GetCharacterMovement()->JumpZVelocity = 480.0f;
 
 
 }
@@ -213,7 +213,7 @@ void AUnrealSFASCharacter::Interact()
 	FVector EndPoint = GetActorLocation() + GetActorRotation().Vector() * CastRange;
 	FHitResult Hit;
 	bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
-	if(ObjectInRange && PlayerMovement==Walking)
+	if (ObjectInRange && PlayerMovement == Walking)
 	{
 		if(Hit.GetActor()->ActorHasTag("Interact"))
 		{
