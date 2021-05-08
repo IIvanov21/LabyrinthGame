@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "UnrealSFASCharacter.generated.h"
 class UAnimInstanceBase;
-
+class AProjectileActor;
 UENUM()
 enum PlayerMovementState
 {
@@ -80,6 +80,16 @@ public:
 private:
 	PlayerMovementState PlayerMovement;
 
+	/*Projectile throwable instance controller*/
+	UPROPERTY(EditAnywhere)
+		USceneComponent* ProjectileSpawnPoint;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<AProjectileActor> ProjectileClass;
+	/*
+	 * Methods to create the projectile.
+	 */
+	void OnBeginFire();
+	void OnEndFire();
 protected:
 
 	//// Called when the game starts or when spawned

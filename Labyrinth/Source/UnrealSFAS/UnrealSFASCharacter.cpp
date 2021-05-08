@@ -10,9 +10,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "PushActor.h"
+#include "ProjectileActor.h"
 //////////////////////////////////////////////////////////////////////////
 // AUnrealSFASCharacter
 
@@ -55,6 +57,9 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 	PlayerMovement = Walking;
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
+	ProjectileSpawnPoint->SetupAttachment(GetMesh());
+	ProjectileSpawnPoint->SetRelativeLocation(GetMesh()->GetSocketLocation("RightHand"));
 
 }
 
@@ -70,7 +75,9 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AUnrealSFASCharacter::Interact);
 	PlayerInputComponent->BindAction("PressedMove", IE_Pressed, this, &AUnrealSFASCharacter::MoveInteractionPressed);
 	PlayerInputComponent->BindAction("PressedMove", IE_Released,this, &AUnrealSFASCharacter::MoveInteractionReleased);
-	
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUnrealSFASCharacter::OnBeginFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AUnrealSFASCharacter::OnEndFire);
+
 	PlayerInputComponent->BindAxis("MoveForward", this, &AUnrealSFASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AUnrealSFASCharacter::MoveRight);
 
@@ -90,6 +97,25 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AUnrealSFASCharacter::OnResetVR);
 
 	PlayerInputComponent->BindAction("ShowPlayerPos", IE_Pressed, this, &AUnrealSFASCharacter::ShowPlayerCoordinates);
+}
+
+void AUnrealSFASCharacter::OnBeginFire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire Pressed!"));
+}
+
+void AUnrealSFASCharacter::OnEndFire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Fire Released!"));
+	if (ProjectileClass)
+	{
+		FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
+		TempProjectile->SetOwner(this);
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("Failed to get projectile class."));
+	
 }
 
 void AUnrealSFASCharacter::BeginPlay()
