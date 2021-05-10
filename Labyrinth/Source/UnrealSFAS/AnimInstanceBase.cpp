@@ -12,13 +12,14 @@ UAnimInstanceBase::UAnimInstanceBase()
 	IsWalking = false;
 	IsMovingRight = false;
 	IsFalling = false;
+	IsAttacking = false;
 }
 
 
 
 void UAnimInstanceBase::UpdateAnimationProperties()
 {
-
+	
 }
 
 void UAnimInstanceBase::Crouched()

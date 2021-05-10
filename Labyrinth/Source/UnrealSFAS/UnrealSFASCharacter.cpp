@@ -63,6 +63,11 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 
 }
 
+void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
+{
+	PlayerMovement = State;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -102,19 +107,13 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 void AUnrealSFASCharacter::OnBeginFire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire Pressed!"));
+	if (PlayerMovement!=Interaction) AnimationUpdate->IsAttacking = true;
 }
 
 void AUnrealSFASCharacter::OnEndFire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire Released!"));
-	if (ProjectileClass)
-	{
-		FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
-		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
-		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
-		TempProjectile->SetOwner(this);
-	}
-	else UE_LOG(LogTemp, Warning, TEXT("Failed to get projectile class."));
+	
 	
 }
 
@@ -277,6 +276,17 @@ void AUnrealSFASCharacter::UpdateInteraction()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	if (InteractedActor != nullptr)InteractedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
+void AUnrealSFASCharacter::CreateProjectile()
+{
+	if (ProjectileClass)
+	{
+		FVector SpawnLocation = ProjectileSpawnPoint->GetComponentLocation();
+		FRotator SpawnRotation = ProjectileSpawnPoint->GetComponentRotation();
+		AProjectileActor* TempProjectile = GetWorld()->SpawnActor<AProjectileActor>(ProjectileClass, SpawnLocation, SpawnRotation);
+		TempProjectile->SetOwner(this);
+	}
+	else UE_LOG(LogTemp, Warning, TEXT("Failed to get projectile class."));
+}
 void AUnrealSFASCharacter::Interact()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Pressing Interact."));
@@ -357,11 +367,14 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 			// get forward vector
 			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 			AddMovementInput(Direction, Value);
+			
 
 		}
+	
 	}
 	else if(PlayerMovement == Interaction && MovingForwards )
 	{
+		
 		PushActorForwards(Value);
 		if(AnimationUpdate->IsPushing)AddMovementInput(GetActorForwardVector()*Value ,0.1f);
 		PlayPushPullForwards(Value);
@@ -376,6 +389,8 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 
 void AUnrealSFASCharacter::MoveRight(float Value)
 {
+	
+
 	if (PlayerMovement == Walking)
 	{
 		if ((Controller != NULL) && (Value != 0.0f))
@@ -388,7 +403,9 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 			const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 			// add movement in that direction
 			AddMovementInput(Direction, Value);
+		
 		}
+		
 	}
 	else if(PlayerMovement == Interaction && MovingRight)
 	{

@@ -46,9 +46,12 @@ class AUnrealSFASCharacter : public ACharacter
 		bool MovingRight = true;
 	UPROPERTY(EditAnywhere)
 		bool IsPlayed = false;
+	
 public:
 	
 	AUnrealSFASCharacter();
+	UFUNCTION()
+		void ChangeState(PlayerMovementState State);
 	UFUNCTION()
 		 void SetDoorKeyState() { IsKeyCollected = true; }
 	UFUNCTION()
@@ -80,6 +83,12 @@ public:
 		void UpdateInteraction();
 	UPROPERTY()
 		APawn* InteractedActor;
+
+	/*
+	 * Providing access to projectile creation from other classes.
+	 */
+	UFUNCTION()
+		void CreateProjectile();
 private:
 	PlayerMovementState PlayerMovement;
 
@@ -93,7 +102,10 @@ private:
 	 */
 	void OnBeginFire();
 	void OnEndFire();
-
+	/*
+	 * Track Movement Value
+	 */
+	float MovingValue;
 	/*
 	 * Timer for jump animation.
 	 */

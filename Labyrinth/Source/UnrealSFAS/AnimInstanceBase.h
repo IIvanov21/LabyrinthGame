@@ -25,7 +25,8 @@ class UNREALSFAS_API UAnimInstanceBase : public UAnimInstance
 public:
 	
 	UAnimInstanceBase();
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		FAnimNotifyEvent AttackNotify;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		UAnimMontage* PullMontage;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -40,6 +41,8 @@ public:
 		float AnimPlayRate;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsPushingRight;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		bool IsAttacking;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsJumping;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
