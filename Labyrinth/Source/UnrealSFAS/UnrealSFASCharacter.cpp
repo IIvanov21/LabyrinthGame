@@ -130,6 +130,7 @@ void AUnrealSFASCharacter::BeginPlay()
 void AUnrealSFASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
 	if (PlayerMovement == Interaction && InteractedActor != nullptr)
 	{
 		float DistanceToObject = UKismetMathLibrary::Vector_Distance(GetActorLocation(), InteractedActor->GetActorLocation());
@@ -138,11 +139,20 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 			UpdateInteraction();
 		}
 	}
+	else if (PlayerMovement == Walking)
+	{
+		if (JumpAnimUpdate > 0.0f)JumpAnimUpdate -= DeltaTime;
+		if (GetCharacterMovement()->IsFalling() && JumpAnimUpdate <= 0.0f)
+		{
+			AnimationUpdate->IsFalling = true;
+		}
+	}
 }
 
 void AUnrealSFASCharacter::Jump()
 {
 	Super::Jump();
+	JumpAnimUpdate = 0.5f;
 	AnimationUpdate->SetJumpTrue();
 }
 
@@ -157,7 +167,7 @@ void AUnrealSFASCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 	AnimationUpdate->SetJumpFalse();
-	
+	AnimationUpdate->IsFalling = false;
 }
 
 
@@ -213,10 +223,6 @@ void AUnrealSFASCharacter::PlayPushPullRight(float Value)
 	{
 		if (Value == 0.0f)
 		{
-			AnimationUpdate->PlayAnimation("PushLeft", Pause);
-			AnimationUpdate->PlayAnimation("PushRight", Pause);
-			AnimationUpdate->PlayAnimation("PushSide", Pause);
-
 			AnimationUpdate->AnimPlayRate = 0.0f;
 
 		}
@@ -299,6 +305,7 @@ void AUnrealSFASCharacter::Interact()
 	else
 	{
 		UpdateInteraction();
+		
 
 	}
 }

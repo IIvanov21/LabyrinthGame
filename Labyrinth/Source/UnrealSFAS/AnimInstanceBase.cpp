@@ -11,6 +11,7 @@ UAnimInstanceBase::UAnimInstanceBase()
 	IsJumping = false;
 	IsWalking = false;
 	IsMovingRight = false;
+	IsFalling = false;
 }
 
 

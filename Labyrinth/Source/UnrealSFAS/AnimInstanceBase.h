@@ -33,6 +33,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsPushing;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		bool IsFalling;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsMovingRight;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float AnimPlayRate;

@@ -5,6 +5,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "UnrealSFASCharacter.generated.h"
 class UAnimInstanceBase;
 class AProjectileActor;
@@ -92,6 +93,11 @@ private:
 	 */
 	void OnBeginFire();
 	void OnEndFire();
+
+	/*
+	 * Timer for jump animation.
+	 */
+	float JumpAnimUpdate=0.0f;
 protected:
 
 	//// Called when the game starts or when spawned
@@ -144,7 +150,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Jump() override;
 	virtual void StopJumping() override;
-	
 	virtual void Landed(const FHitResult& Hit) override;
 };
 
