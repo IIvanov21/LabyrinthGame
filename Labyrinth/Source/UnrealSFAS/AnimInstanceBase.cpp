@@ -5,11 +5,12 @@
 
 UAnimInstanceBase::UAnimInstanceBase()
 {
-	IsPulling = false;
+	IsPushingRight = false;
 	IsPushing = false;
 	IsCrouching = false;
 	IsJumping = false;
 	IsWalking = false;
+	IsMovingRight = false;
 }
 
 
@@ -44,7 +45,7 @@ void UAnimInstanceBase::SetJumpFalse()
 
 void UAnimInstanceBase::SetPull(bool condition)
 {
-	IsPulling = condition;
+	IsPushingRight = condition;
 }
 
 
@@ -66,7 +67,8 @@ void UAnimInstanceBase::PlayAnimation(FName Animation, AnimationState State)
 	{
 		if (PullMontage != nullptr && Animation == "Pull" )
 		{
-			
+			IsPushingRight = false;
+
 			UE_LOG(LogTemp, Warning, TEXT("Playing Pull Anim!"));
 			if (Montage_GetCurrentSection(PullMontage) == "Loop")
 			{
@@ -81,7 +83,7 @@ void UAnimInstanceBase::PlayAnimation(FName Animation, AnimationState State)
 		}
 		else if (PushMontage != nullptr && Animation == "Push")
 		{
-
+			IsPushingRight = false;
 			UE_LOG(LogTemp, Warning, TEXT("Playing Push Anim!"));
 			if (Montage_GetCurrentSection(PushMontage) == "Loop")
 			{
@@ -94,21 +96,31 @@ void UAnimInstanceBase::PlayAnimation(FName Animation, AnimationState State)
 				Montage_Play(PushMontage);
 			}
 		}
+		
 	}
 	else if (State == AnimationState::Pause)
 	{
 		if (PullMontage!=nullptr && Animation == "Pull" && Montage_GetCurrentSection(PullMontage)== "Loop")Montage_Pause(PullMontage);
 		else if (PushMontage != nullptr && Animation == "Push" && Montage_GetCurrentSection(PushMontage) == "Loop")Montage_Pause(PushMontage);
 		
+
+
+		
 	}
 	else if (State == AnimationState::Resume)
 	{
 		if (PullMontage != nullptr && Animation == "Pull" && Montage_GetCurrentSection(PullMontage) == "Loop")Montage_Resume( PullMontage);
 		else if (PushMontage != nullptr && Animation == "Push" && Montage_GetCurrentSection(PushMontage) == "Loop")Montage_Resume(PushMontage);
+		
+
+
 	}
 	else if (State == AnimationState::Stop)
 	{
 		if (PullMontage != nullptr && Animation == "Pull")Montage_Stop(0.25f,PullMontage);
 		else if (PushMontage != nullptr && Animation == "Push")Montage_Stop(0.25f, PushMontage);
+		
+
+
 	}
 }

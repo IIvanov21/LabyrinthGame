@@ -173,7 +173,7 @@ void AUnrealSFASCharacter::MoveInteractionReleased()
 	MovingForwards = true;
 }
 
-void AUnrealSFASCharacter::PlayPushPull(float Value)
+void AUnrealSFASCharacter::PlayPushPullForwards(float Value)
 {
 	if (PlayerMovement==Interaction)
 	{
@@ -181,7 +181,6 @@ void AUnrealSFASCharacter::PlayPushPull(float Value)
 		{
 			AnimationUpdate->PlayAnimation("Pull", Pause);
 			AnimationUpdate->PlayAnimation("Push", Pause);
-
 		}
 		else if (Value > 0.0f)
 		{
@@ -189,6 +188,7 @@ void AUnrealSFASCharacter::PlayPushPull(float Value)
 			AnimationUpdate->PlayAnimation("Push", Play);
 			AnimationUpdate->PlayAnimation("Push", Resume);
 			AnimationUpdate->PlayAnimation("Pull", Stop);
+
 		}
 		else if (Value < 0.0f)
 		{
@@ -197,8 +197,46 @@ void AUnrealSFASCharacter::PlayPushPull(float Value)
 			AnimationUpdate->PlayAnimation("Push", Stop);
 			AnimationUpdate->PlayAnimation("Pull", Resume);
 
+
 		}
 
+
+	}
+	else
+	{
+		AnimationUpdate->SetWalk(true);
+	}
+}
+void AUnrealSFASCharacter::PlayPushPullRight(float Value)
+{
+	if (PlayerMovement == Interaction)
+	{
+		if (Value == 0.0f)
+		{
+			AnimationUpdate->PlayAnimation("PushLeft", Pause);
+			AnimationUpdate->PlayAnimation("PushRight", Pause);
+			AnimationUpdate->PlayAnimation("PushSide", Pause);
+
+			AnimationUpdate->AnimPlayRate = 0.0f;
+
+		}
+		else if (Value > 0.0f)
+		{
+			AnimationUpdate->SetWalk(false);
+			AnimationUpdate->AnimPlayRate = 1.0f;
+			AnimationUpdate->IsMovingRight = true;
+			AnimationUpdate->IsPushingRight = true;
+			AnimationUpdate->IsPushing = true;
+		}
+		else if (Value < 0.0f)
+		{
+			AnimationUpdate->SetWalk(false);
+			AnimationUpdate->AnimPlayRate = 1.0f;
+			AnimationUpdate->IsMovingRight = false;
+			AnimationUpdate->IsPushingRight = true;
+			AnimationUpdate->IsPushing = true;
+
+		}
 
 	}
 	else
@@ -219,7 +257,7 @@ void AUnrealSFASCharacter::PushActorForwards(float Value)
 void AUnrealSFASCharacter::PushActorRight(float Value)
 {
 	FString ActorName = InteractedActor->GetName();
-	UE_LOG(LogTemp, Warning, TEXT("Hit something: %s"), *ActorName);
+	//UE_LOG(LogTemp, Warning, TEXT("Hit something: %s"), *ActorName);
 	InteractedActor->AddActorWorldOffset(((GetActorRightVector() * GetVelocity().Size()) * Value)*GetWorld()->DeltaTimeSeconds);
 	if(Value!=0.0f)MovingForwards = false;
 }
@@ -228,6 +266,8 @@ void AUnrealSFASCharacter::UpdateInteraction()
 	PlayerMovement = Walking;
 	AnimationUpdate->PlayAnimation("Pull", Stop);
 	AnimationUpdate->PlayAnimation("Push", Stop);
+	AnimationUpdate->IsPushingRight = false;
+
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	if (InteractedActor != nullptr)InteractedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
@@ -244,7 +284,8 @@ void AUnrealSFASCharacter::Interact()
 		if(Hit.GetActor()->ActorHasTag("Interact"))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("You can interact with this actor."));
-			PlayPushPull(0);
+			PlayPushPullRight(0);
+			PlayPushPullForwards(0);
 			InteractedActor = Cast<APawn>(Hit.GetActor());
 			GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f); 
 			InteractedActor->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -316,7 +357,7 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 	{
 		PushActorForwards(Value);
 		if(AnimationUpdate->IsPushing)AddMovementInput(GetActorForwardVector()*Value ,0.1f);
-		PlayPushPull(Value);
+		PlayPushPullForwards(Value);
 	
 
 	}
@@ -346,7 +387,7 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 	{
 		PushActorRight(Value);
 		if (AnimationUpdate->IsPushing)AddMovementInput(GetActorRightVector()*Value, 0.1f);
-	
+		PlayPushPullRight(Value);
 	}
 }
 void AUnrealSFASCharacter::ShowPlayerCoordinates()

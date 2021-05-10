@@ -68,7 +68,9 @@ public:
 	UFUNCTION()
 		void MoveInteractionReleased();
 	UFUNCTION()
-		void PlayPushPull(float Value);
+		void PlayPushPullForwards(float Value);
+	UFUNCTION()
+		void PlayPushPullRight(float Value);
 	UFUNCTION()
 		void PushActorForwards(float Value);
 	UFUNCTION()
