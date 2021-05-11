@@ -128,37 +128,44 @@ void AUnrealSFASCharacter::OnEndFire()
 }
 void AUnrealSFASCharacter::OnAimBegin()
 {
-	//Default camera arm position: FVector(370.0f, 35.0f, 65.0f)
-	GetController()->SetControlRotation(CameraDefault->GetComponentRotation());
-	FollowCamera->SetRelativeLocation(FVector(370.0f, 35.0f, 65.0f));
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
-	PlayerMovement = Aim;
-	PlayerController->DrawCrosshair(true);
-	
+	if (PlayerMovement == Walking)
+	{
+		//Default camera arm position: FVector(370.0f, 35.0f, 65.0f)
+		GetController()->SetControlRotation(CameraDefault->GetComponentRotation());
+
+		FollowCamera->SetRelativeLocation(FVector(370.0f, 35.0f, 65.0f));
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+		PlayerMovement = Aim;
+		PlayerController->DrawCrosshair(true);
+		AnimationUpdate->IsAimWalking = true;
+	}
 
 	
 
 }
 void AUnrealSFASCharacter::OnAimEnd()
 {
-	FollowCamera->ResetRelativeTransform();
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
-	PlayerMovement = Walking;
-	FollowCamera->bUsePawnControlRotation = true;
-	CameraBoom->bUsePawnControlRotation = true;
+	if (PlayerMovement == Aim)
+	{
+		FollowCamera->ResetRelativeTransform();
+		GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+		PlayerMovement = Walking;
+		FollowCamera->bUsePawnControlRotation = true;
+		CameraBoom->bUsePawnControlRotation = true;
+		AnimationUpdate->IsAimWalking = false;
 
-	PlayerController->DrawCrosshair(false);
-
+		PlayerController->DrawCrosshair(false);
+	}
 }
 
 void AUnrealSFASCharacter::SetRotateAmount(float Value)
 {
 	if (PlayerMovement == Aim)
 	{
-		float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
-		FRotator Rotation = FRotator(0.0f, RotateAmount, 0.0f);
-		DeltaRotation = FQuat(Rotation);
-		AddActorLocalRotation(DeltaRotation, true);
+		if (Value != 0.0f)
+		{
+			SetActorRotation(FRotator(0.0f,GetControlRotation().Yaw,0.0f));
+		}
 	}
 }
 
@@ -200,11 +207,7 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 		float CastRange = 10000.0f;
 		FVector EndPoint = CameraLocation + CameraRotation.Vector() * CastRange;
 		FHitResult Hit;
-		TArray<AActor*> Actors;
-		Actors.Add(this);
-		/*bool ObjectInRange = UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), EndPoint, ETraceTypeQuery::TraceTypeQuery2,
-			false, Actors, EDrawDebugTrace::Type::ForDuration, Hit, true, FLinearColor::Red, FLinearColor::Green, 2);*/
-		bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
+		GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
 		ProjectileSpawnPoint->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(ProjectileSpawnPoint->GetComponentLocation(), Hit.TraceEnd));
 		
 	}
@@ -213,14 +216,20 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 
 void AUnrealSFASCharacter::Jump()
 {
-	Super::Jump();
-	JumpAnimUpdate = 0.5f;
-	AnimationUpdate->SetJumpTrue();
+	if (PlayerMovement == Walking)
+	{
+		Super::Jump();
+		JumpAnimUpdate = 0.5f;
+		AnimationUpdate->SetJumpTrue();
+	}
 }
 
 void AUnrealSFASCharacter::StopJumping()
 {
-	Super::StopJumping();
+	if (PlayerMovement == Walking)
+	{
+		Super::StopJumping();
+	}
 }
 
 
@@ -352,34 +361,37 @@ void AUnrealSFASCharacter::CreateProjectile()
 }
 void AUnrealSFASCharacter::Interact()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Pressing Interact."));
-	
-	float CastRange = 50.0f;
-	FVector EndPoint = GetActorLocation() + GetActorRotation().Vector() * CastRange;
-	FHitResult Hit;
-	bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
-	if (ObjectInRange && PlayerMovement == Walking)
+	if (PlayerMovement != Aim)
 	{
-		if(Hit.GetActor()->ActorHasTag("Interact"))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("You can interact with this actor."));
-			PlayPushPullRight(0);
-			PlayPushPullForwards(0);
-			InteractedActor = Cast<APawn>(Hit.GetActor());
-			GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f); 
-			InteractedActor->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			PlayerMovement = Interaction;
-			SetActorRotation(Cast<APushActor>(InteractedActor)->GetOrientation(GetActorLocation()));
-			UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(EOrientPositionSelector::Orientation);
-			SetActorRelativeLocation(Cast<APushActor>(InteractedActor)->GetLocation(GetActorLocation()));
-			AnimationUpdate->PlayAnimation("Pull", Play);
-		}
-	}
-	else
-	{
-		UpdateInteraction();
-		
+		UE_LOG(LogTemp, Warning, TEXT("Pressing Interact."));
 
+		float CastRange = 50.0f;
+		FVector EndPoint = GetActorLocation() + GetActorRotation().Vector() * CastRange;
+		FHitResult Hit;
+		bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
+		if (ObjectInRange && PlayerMovement == Walking)
+		{
+			if (Hit.GetActor()->ActorHasTag("Interact"))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("You can interact with this actor."));
+				PlayPushPullRight(0);
+				PlayPushPullForwards(0);
+				InteractedActor = Cast<APawn>(Hit.GetActor());
+				GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+				InteractedActor->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				PlayerMovement = Interaction;
+				SetActorRotation(Cast<APushActor>(InteractedActor)->GetOrientation(GetActorLocation()));
+				UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(EOrientPositionSelector::Orientation);
+				SetActorRelativeLocation(Cast<APushActor>(InteractedActor)->GetLocation(GetActorLocation()));
+				AnimationUpdate->PlayAnimation("Pull", Play);
+			}
+		}
+		else
+		{
+			UpdateInteraction();
+
+
+		}
 	}
 }
 
@@ -448,7 +460,8 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 	{
 
 		AddMovementInput(GetActorForwardVector() * Value, 0.3f);
-		
+		AnimationUpdate->AimWalkSpeed = Value;
+
 
 
 	}
@@ -483,13 +496,13 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 		PushActorRight(Value);
 		if (AnimationUpdate->IsPushing)AddMovementInput(GetActorRightVector()*Value, 0.1f);
 		PlayPushPullRight(Value);
+		
 	}
 	else if (PlayerMovement == Aim)
 	{
 
 		AddMovementInput(GetActorRightVector() * Value, 0.3f);
-
-
+		AnimationUpdate->AimWalkAngle = Value;
 
 	}
 }

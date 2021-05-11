@@ -40,6 +40,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float AnimPlayRate;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float AimWalkSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		float AimWalkAngle;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsPushingRight;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsAttacking;
@@ -49,6 +53,8 @@ public:
 		bool IsCrouching;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		bool IsWalking;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		bool IsAimWalking;
 	UFUNCTION(BlueprintCallable, Category = "UpdateAnimationProperties")
 		void UpdateAnimationProperties();
 	UFUNCTION(BlueprintCallable, Category = "UpdateCrouch")

@@ -13,6 +13,9 @@ UAnimInstanceBase::UAnimInstanceBase()
 	IsMovingRight = false;
 	IsFalling = false;
 	IsAttacking = false;
+	IsAimWalking = false;
+	AimWalkSpeed = 0.0f;
+	AimWalkAngle = 0.0f;
 }
 
 

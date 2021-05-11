@@ -120,7 +120,7 @@ private:
 	UPROPERTY()
 		FQuat   DeltaRotation;
 	UPROPERTY(EditAnywhere)
-		float RotateSpeed = 300.0f;
+		float RotateSpeed = 350.0f;
 	UPROPERTY()
 		APlayerControllerBase* PlayerController;
 	
