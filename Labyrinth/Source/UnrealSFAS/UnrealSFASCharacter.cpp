@@ -4,6 +4,7 @@
 
 #include "AnimInstanceBase.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "PlayerControllerBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -12,9 +13,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/ArrowComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "PushActor.h"
 #include "ProjectileActor.h"
+#include "Kismet/KismetSystemLibrary.h"
 //////////////////////////////////////////////////////////////////////////
 // AUnrealSFASCharacter
 
@@ -59,8 +62,8 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 	ProjectileSpawnPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Projectile Spawn Point"));
 	ProjectileSpawnPoint->SetupAttachment(GetMesh());
-	ProjectileSpawnPoint->SetRelativeLocation(GetMesh()->GetSocketLocation("RightHand"));
-
+	CameraDefault = CreateDefaultSubobject<UArrowComponent>(TEXT("CameraDefault"));
+	CameraDefault->SetupAttachment(GetCapsuleComponent());
 }
 
 void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
@@ -80,9 +83,14 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AUnrealSFASCharacter::Interact);
 	PlayerInputComponent->BindAction("PressedMove", IE_Pressed, this, &AUnrealSFASCharacter::MoveInteractionPressed);
 	PlayerInputComponent->BindAction("PressedMove", IE_Released,this, &AUnrealSFASCharacter::MoveInteractionReleased);
+	/*Create the projectile itself*/
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUnrealSFASCharacter::OnBeginFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AUnrealSFASCharacter::OnEndFire);
+	/*Get into aim position bindings*/
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &AUnrealSFASCharacter::OnAimBegin);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &AUnrealSFASCharacter::OnAimEnd);
 
+	/*Movement bindings*/
 	PlayerInputComponent->BindAxis("MoveForward", this, &AUnrealSFASCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AUnrealSFASCharacter::MoveRight);
 
@@ -90,6 +98,8 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &AUnrealSFASCharacter::SetRotateAmount);
+
 	PlayerInputComponent->BindAxis("TurnRate", this, &AUnrealSFASCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AUnrealSFASCharacter::LookUpAtRate);
@@ -107,7 +117,7 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 void AUnrealSFASCharacter::OnBeginFire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire Pressed!"));
-	if (PlayerMovement!=Interaction) AnimationUpdate->IsAttacking = true;
+	if (PlayerMovement==Aim) AnimationUpdate->IsAttacking = true;
 }
 
 void AUnrealSFASCharacter::OnEndFire()
@@ -116,13 +126,48 @@ void AUnrealSFASCharacter::OnEndFire()
 	
 	
 }
+void AUnrealSFASCharacter::OnAimBegin()
+{
+	//Default camera arm position: FVector(370.0f, 35.0f, 65.0f)
+	GetController()->SetControlRotation(CameraDefault->GetComponentRotation());
+	FollowCamera->SetRelativeLocation(FVector(370.0f, 35.0f, 65.0f));
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
+	PlayerMovement = Aim;
+	PlayerController->DrawCrosshair(true);
+	
+
+	
+
+}
+void AUnrealSFASCharacter::OnAimEnd()
+{
+	FollowCamera->ResetRelativeTransform();
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
+	PlayerMovement = Walking;
+	FollowCamera->bUsePawnControlRotation = true;
+	CameraBoom->bUsePawnControlRotation = true;
+
+	PlayerController->DrawCrosshair(false);
+
+}
+
+void AUnrealSFASCharacter::SetRotateAmount(float Value)
+{
+	if (PlayerMovement == Aim)
+	{
+		float RotateAmount = Value * RotateSpeed * GetWorld()->DeltaTimeSeconds;
+		FRotator Rotation = FRotator(0.0f, RotateAmount, 0.0f);
+		DeltaRotation = FQuat(Rotation);
+		AddActorLocalRotation(DeltaRotation, true);
+	}
+}
 
 void AUnrealSFASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	AnimationUpdate = Cast<UAnimInstanceBase>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->JumpZVelocity = 480.0f;
-
+	PlayerController = Cast<APlayerControllerBase>(GetWorld()->GetFirstPlayerController());
 
 }
 
@@ -146,6 +191,24 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 			AnimationUpdate->IsFalling = true;
 		}
 	}
+	else if (PlayerMovement == Aim)
+	{
+		AController* ControllerRef = GetController();
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		ControllerRef->GetPlayerViewPoint(CameraLocation, CameraRotation);
+		float CastRange = 10000.0f;
+		FVector EndPoint = CameraLocation + CameraRotation.Vector() * CastRange;
+		FHitResult Hit;
+		TArray<AActor*> Actors;
+		Actors.Add(this);
+		/*bool ObjectInRange = UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), EndPoint, ETraceTypeQuery::TraceTypeQuery2,
+			false, Actors, EDrawDebugTrace::Type::ForDuration, Hit, true, FLinearColor::Red, FLinearColor::Green, 2);*/
+		bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
+		ProjectileSpawnPoint->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(ProjectileSpawnPoint->GetComponentLocation(), Hit.TraceEnd));
+		
+	}
+
 }
 
 void AUnrealSFASCharacter::Jump()
@@ -306,7 +369,7 @@ void AUnrealSFASCharacter::Interact()
 			GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f); 
 			InteractedActor->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			PlayerMovement = Interaction;
-			SetActorRotation(Cast<APushActor>(InteractedActor)->GetOrientation(GetActorLocation()));//Needs a fix
+			SetActorRotation(Cast<APushActor>(InteractedActor)->GetOrientation(GetActorLocation()));
 			UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition(EOrientPositionSelector::Orientation);
 			SetActorRelativeLocation(Cast<APushActor>(InteractedActor)->GetLocation(GetActorLocation()));
 			AnimationUpdate->PlayAnimation("Pull", Play);
@@ -381,6 +444,14 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 	
 
 	}
+	else if (PlayerMovement == Aim)
+	{
+
+		AddMovementInput(GetActorForwardVector() * Value, 0.3f);
+		
+
+
+	}
 	
 		
 	
@@ -412,6 +483,14 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 		PushActorRight(Value);
 		if (AnimationUpdate->IsPushing)AddMovementInput(GetActorRightVector()*Value, 0.1f);
 		PlayPushPullRight(Value);
+	}
+	else if (PlayerMovement == Aim)
+	{
+
+		AddMovementInput(GetActorRightVector() * Value, 0.3f);
+
+
+
 	}
 }
 void AUnrealSFASCharacter::ShowPlayerCoordinates()

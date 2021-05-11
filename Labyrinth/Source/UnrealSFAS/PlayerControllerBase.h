@@ -20,6 +20,7 @@ class UNREALSFAS_API APlayerControllerBase : public APlayerController
 
 public:
 	virtual void BeginPlay() override;
+	void DrawCrosshair(bool Draw);
 	void SetScore(int Points);
 	void  SetTimer(int timeIn);
 	void SetKey();
@@ -50,4 +51,9 @@ private:
 	UPROPERTY(EditAnywhere)
 		UScoreUserWidget* ScoreText;
 
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UUserWidget> CrosshairClass;
+	UPROPERTY(EditAnywhere)
+		UUserWidget* CrosshairUI;
 };

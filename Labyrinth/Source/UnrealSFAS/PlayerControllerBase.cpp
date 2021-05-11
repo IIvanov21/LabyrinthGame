@@ -29,12 +29,19 @@ void APlayerControllerBase::BeginPlay()
 	if (KeyUI != nullptr)KeyUI->AddToViewport();
 	KeySet = Cast<UKeyUserWidget>(KeyUI);
 	
+	CrosshairUI = CreateWidget(this, CrosshairClass);
 
 }
 
 
 
 
+
+void APlayerControllerBase::DrawCrosshair(bool Draw)
+{
+	if (CrosshairUI != nullptr && Draw)CrosshairUI->AddToViewport();
+	else if(CrosshairUI!=nullptr && !Draw)CrosshairUI->RemoveFromViewport();
+}
 
 void APlayerControllerBase::SetScore(int Points)
 {

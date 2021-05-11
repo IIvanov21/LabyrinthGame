@@ -9,12 +9,15 @@
 #include "UnrealSFASCharacter.generated.h"
 class UAnimInstanceBase;
 class AProjectileActor;
+class APlayerControllerBase;
 UENUM()
 enum PlayerMovementState
 {
 	Idle UMETA(DisplayName = "Idle"),
 	Walking UMETA(DisplayName = "Walking"),
 	Interaction UMETA(DisplayName = "Interact"),
+	Aim UMETA(DisplayName = "Aim"),
+
 };
 
 UCLASS(config=Game)
@@ -46,6 +49,8 @@ class AUnrealSFASCharacter : public ACharacter
 		bool MovingRight = true;
 	UPROPERTY(EditAnywhere)
 		bool IsPlayed = false;
+	UPROPERTY(EditAnywhere)
+		UArrowComponent* CameraDefault;
 	
 public:
 	
@@ -103,13 +108,27 @@ private:
 	void OnBeginFire();
 	void OnEndFire();
 	/*
-	 * Track Movement Value
+	 * Aim functions
 	 */
-	float MovingValue;
+	FVector RelativeRotation;
+
+	void OnAimBegin();
+	void OnAimEnd();
+	void SetRotateAmount(float Value);
+	UPROPERTY()
+		FVector DeltaLocation;
+	UPROPERTY()
+		FQuat   DeltaRotation;
+	UPROPERTY(EditAnywhere)
+		float RotateSpeed = 300.0f;
+	UPROPERTY()
+		APlayerControllerBase* PlayerController;
+	
 	/*
-	 * Timer for jump animation.
+	 * Timers used to reset.
 	 */
 	float JumpAnimUpdate=0.0f;
+
 protected:
 
 	//// Called when the game starts or when spawned

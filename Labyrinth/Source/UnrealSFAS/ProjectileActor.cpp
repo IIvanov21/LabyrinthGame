@@ -32,7 +32,7 @@ AProjectileActor::AProjectileActor()
 
 void AProjectileActor::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if(!OtherActor->ActorHasTag("Player"))
+	if(OtherActor->ActorHasTag("Enemy"))
 	{
 		/*
 		 * Apply the damage to the given actor.
