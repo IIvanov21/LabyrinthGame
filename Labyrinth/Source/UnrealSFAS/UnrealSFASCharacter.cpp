@@ -74,6 +74,8 @@ void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
 //////////////////////////////////////////////////////////////////////////
 // Input
 
+
+
 void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -174,6 +176,8 @@ void AUnrealSFASCharacter::BeginPlay()
 	Super::BeginPlay();
 	AnimationUpdate = Cast<UAnimInstanceBase>(GetMesh()->GetAnimInstance());
 	GetCharacterMovement()->JumpZVelocity = 480.0f;
+	this->OnActorHit.AddDynamic(this, &AUnrealSFASCharacter::OnHit);
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AUnrealSFASCharacter::BeginOverlap);
 	PlayerController = Cast<APlayerControllerBase>(GetWorld()->GetFirstPlayerController());
 
 }
@@ -509,5 +513,19 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 void AUnrealSFASCharacter::ShowPlayerCoordinates()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Player position: %d %f %s"),GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
+
+}
+
+void AUnrealSFASCharacter::OnHit(AActor* HitComponent, AActor* OtherActor,  FVector NormalImpulse, const FHitResult& Hit)
+{
+		UE_LOG(LogTemp, Warning, TEXT("Player has been hit!"));
+	if(OtherActor->ActorHasTag("Enemy"))
+	{
+	}
+}
+
+void AUnrealSFASCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player has been hit!"));
 
 }

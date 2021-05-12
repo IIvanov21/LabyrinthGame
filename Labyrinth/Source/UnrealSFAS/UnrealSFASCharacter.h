@@ -166,7 +166,16 @@ protected:
 	/*Show Player coordinates*/
 	void ShowPlayerCoordinates();
 
+	void OnHit(AActor* HitComponent, AActor* OtherActor,  FVector NormalImpulse, const FHitResult& Hit);
 
+	// Overlap
+	UFUNCTION()
+		void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
+			AActor* OtherActor,
+			UPrimitiveComponent* OtherComp,
+			int32 OtherBodyIndex,
+			bool bFromSweep,
+			const FHitResult& SweepResult);
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

@@ -17,7 +17,7 @@ public:
 	AProjectileActor();
 private:
 	UPROPERTY(EditAnywhere)
-		float DamageAmount = 10.0f;
+		float DamageAmount = 20.0f;
 	UPROPERTY(EditAnywhere)
 		float MovementSpeed = 1000.0f;
 	UPROPERTY(VisibleAnywhere)

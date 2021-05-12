@@ -5,7 +5,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "EnemyAIController.h"
 // Sets default values
 AProjectileActor::AProjectileActor()
 {
@@ -40,7 +40,8 @@ void AProjectileActor::OnHit(AActor* SelfActor, AActor* OtherActor, FVector Norm
 		UE_LOG(LogTemp, Warning, TEXT("Object hit!"));
 		AActor* ProjectileOwner = GetOwner();
 		if (ProjectileOwner == nullptr)return;
-		UGameplayStatics::ApplyDamage(OtherActor, DamageAmount, ProjectileOwner->GetInstigatorController(), this, UDamageType::StaticClass());
+		AEnemyAIController* Enemy = Cast<AEnemyAIController>(OtherActor->GetOwner());
+		if(Enemy!=nullptr)Enemy->ReduceEnemyHealth(DamageAmount);
 		Destroy();
 	}
 }
