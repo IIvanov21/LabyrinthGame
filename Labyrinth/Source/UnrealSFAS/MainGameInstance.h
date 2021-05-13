@@ -21,7 +21,13 @@ public:
 		float Score;
 	UPROPERTY(EditAnywhere)
 		float Health;
-	
-
+	UPROPERTY(EditAnywhere)
+		bool KeyOne;
+	UPROPERTY(EditAnywhere)
+		bool KeyTwo;
+	UPROPERTY(EditAnywhere)
+		bool KeyThree;
+	UPROPERTY(EditAnywhere)
+		bool KeysCollected;
 
 };

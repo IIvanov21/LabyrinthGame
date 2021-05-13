@@ -24,7 +24,6 @@ void APlayerControllerBase::BeginPlay()
 	UE_LOG(LogTemp, Warning, TEXT("Time: %a"), Time);
 	
 	ScoreUI = CreateWidget(this, ScoreClass);
-	if (ScoreUI != nullptr)ScoreUI->AddToViewport();
 	ScoreText = Cast<UScoreUserWidget>(ScoreUI);
 	SetScore(0);
 

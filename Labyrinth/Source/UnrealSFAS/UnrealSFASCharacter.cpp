@@ -14,6 +14,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/ArrowComponent.h"
+#include "MainGameInstance.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "PushActor.h"
 #include "ProjectileActor.h"
@@ -23,6 +24,7 @@
 
 AUnrealSFASCharacter::AUnrealSFASCharacter()
 {
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -77,6 +79,20 @@ void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
 {
 	PlayerMovement = State;
 }
+
+void AUnrealSFASCharacter::SetDoorKeyState()
+{
+	if(MainGameInstance->KeyOne && MainGameInstance->KeyTwo && MainGameInstance->KeyThree)
+	{
+		MainGameInstance->KeysCollected = true;
+	}
+}
+
+bool AUnrealSFASCharacter::GetDoorKeyState()
+{
+	return MainGameInstance->KeysCollected;
+}
+
 
 
 
@@ -188,7 +204,11 @@ void AUnrealSFASCharacter::BeginPlay()
 	/*
 	 * Setup player properties from the BP.
 	 */
-	PlayerHealth = SetPlayerHealth;
+	MainGameInstance = Cast<UMainGameInstance>(GetGameInstance());
+	if (MainGameInstance != nullptr)
+	{
+		PlayerHealth = MainGameInstance->Health;
+	}
 	
 	GetCharacterMovement()->JumpZVelocity = 480.0f;
 
@@ -197,7 +217,8 @@ void AUnrealSFASCharacter::BeginPlay()
 void AUnrealSFASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+	PlayerController->UpdateHealthStatus(PlayerHealth);
+	PlayerController->SetKey();
 	if (PlayerMovement == Interaction && InteractedActor != nullptr)
 	{
 		float DistanceToObject = UKismetMathLibrary::Vector_Distance(GetActorLocation(), InteractedActor->GetActorLocation());
@@ -533,7 +554,8 @@ void AUnrealSFASCharacter::DamagePlayer(int DamageAmount)
 	UE_LOG(LogTemp, Warning, TEXT("Player is Hit!"));
 
 	PlayerHealth -= DamageAmount;
-	PlayerController->UpdateHealthStatus(PlayerHealth);
+	MainGameInstance->Health -= DamageAmount;
+	PlayerController->UpdateHealthStatus(MainGameInstance->Health);
 	if(PlayerHealth<=0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player has died!"));

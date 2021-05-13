@@ -5,11 +5,11 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-
 #include "UnrealSFASCharacter.generated.h"
 class UAnimInstanceBase;
 class AProjectileActor;
 class APlayerControllerBase;
+class UMainGameInstance;
 UENUM()
 enum PlayerMovementState
 {
@@ -58,9 +58,9 @@ public:
 	UFUNCTION()
 		void ChangeState(PlayerMovementState State);
 	UFUNCTION()
-		 void SetDoorKeyState() { IsKeyCollected = true; }
+		void SetDoorKeyState();
 	UFUNCTION()
-		 bool GetDoorKeyState() { return IsKeyCollected; }
+		bool GetDoorKeyState();
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -102,7 +102,8 @@ public:
 		void CreateProjectile();
 private:
 	PlayerMovementState PlayerMovement;
-
+	UPROPERTY()
+		UMainGameInstance* MainGameInstance;
 	/*Projectile throwable instance controller*/
 	UPROPERTY(EditAnywhere)
 		USceneComponent* ProjectileSpawnPoint;

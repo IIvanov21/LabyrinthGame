@@ -7,6 +7,7 @@
 #include "DoorKey.generated.h"
 class ADoorActor;
 class APlayerControllerBase;
+class UMainGameInstance;
 UCLASS()
 class UNREALSFAS_API ADoorKey : public AActor
 {
@@ -16,8 +17,10 @@ public:
 	// Sets default values for this actor's properties
 	ADoorKey();
 private:
+	UPROPERTY()
+		UMainGameInstance* MainGameInstance;
 	UPROPERTY(EditAnywhere)
-	UStaticMeshComponent* KeyMesh;
+		UStaticMeshComponent* KeyMesh;
 	UPROPERTY(EditAnywhere)
 		APlayerControllerBase* PlayerController;
 	// Called when the game starts or when spawned

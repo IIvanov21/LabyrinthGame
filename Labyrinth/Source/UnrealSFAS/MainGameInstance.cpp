@@ -8,5 +8,10 @@ UMainGameInstance::UMainGameInstance(const FObjectInitializer& ObjectInitializer
 {
 	
 	Time = 600.0f;
+	Health = 100;
+	KeyOne = false;
+	KeyTwo = false;
+	KeyThree = false;
+	KeysCollected = false;
 }
 

@@ -9,6 +9,7 @@
 /**
  * 
  */
+class UMainGameInstance;
 UCLASS()
 class UNREALSFAS_API UKeyUserWidget : public UUserWidget
 {
@@ -17,8 +18,15 @@ private:
 
 	
 public:
+	UPROPERTY(EditAnywhere)
+		UMainGameInstance* MainGameInstance;
 	UPROPERTY(Category = UserInterface, EditAnywhere, BlueprintReadWrite)
-		bool KeyState;
+		bool KeyStateOne;
+	UPROPERTY(Category = UserInterface, EditAnywhere, BlueprintReadWrite)
+		bool KeyStateTwo;
+	UPROPERTY(Category = UserInterface, EditAnywhere, BlueprintReadWrite)
+		bool KeyStateThree;
+
 	UFUNCTION()
 		void KeyCollected();
 	

@@ -2,8 +2,12 @@
 
 
 #include "KeyUserWidget.h"
-
+#include "MainGameInstance.h"
 void UKeyUserWidget::KeyCollected()
 {
-	KeyState = true;
+	MainGameInstance = Cast<UMainGameInstance>(GetGameInstance());
+	
+	KeyStateOne = MainGameInstance->KeyOne;
+	KeyStateTwo = MainGameInstance->KeyTwo;
+	KeyStateThree = MainGameInstance->KeyThree;
 }

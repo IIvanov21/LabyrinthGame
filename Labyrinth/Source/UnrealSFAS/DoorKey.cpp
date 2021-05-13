@@ -5,7 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "UnrealSFASCharacter.h"
 #include "PlayerControllerBase.h"
-
+#include "MainGameInstance.h"
 // Sets default values
 ADoorKey::ADoorKey()
 {
@@ -21,6 +21,9 @@ ADoorKey::ADoorKey()
 void ADoorKey::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	MainGameInstance = Cast<UMainGameInstance>(GetGameInstance());
+
 	//OnActorHit.AddDynamic(this, &ADoorKey::OnHit);
 	KeyMesh->OnComponentBeginOverlap.AddDynamic(this, &ADoorKey::OnOverlapBegin);
 	KeyMesh->OnComponentEndOverlap.AddDynamic(this, &ADoorKey::OnOverlapEnd);
@@ -44,6 +47,10 @@ void ADoorKey::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 {
 	if (OtherActor->GetClass()->IsChildOf(AUnrealSFASCharacter::StaticClass()))
 	{
+		if (this->ActorHasTag("KeyOne")) MainGameInstance->KeyOne = true;
+		if (this->ActorHasTag("KeyTwo")) MainGameInstance->KeyTwo = true;
+		if (this->ActorHasTag("KeyThree")) MainGameInstance->KeyThree = true;
+
 		UE_LOG(LogTemp, Warning, TEXT("Key Collected!"));
 		PlayerController->SetKey();
 		AUnrealSFASCharacter* Player = Cast<AUnrealSFASCharacter>(OtherActor);
