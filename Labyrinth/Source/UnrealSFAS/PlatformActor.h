@@ -21,9 +21,21 @@ public:
 		void CheckLocationLeft();
 	UFUNCTION()
 		void CheckLocationRight();
-private:
+	UFUNCTION()
+		void CheckLocationUp();
+	UFUNCTION()
+		void CheckLocationDown();
+	UPROPERTY(EditAnywhere)
+		bool MovingLeft = true;
+	UPROPERTY(EditAnywhere)
+		bool MovingUp = true;
+	UPROPERTY(EditAnywhere)
 	float MovementSpeed = 30.0f;
-	bool MovingLeft = true;
+	UPROPERTY(EditAnywhere)
+		bool MoveSideways=true;
+	UPROPERTY(EditAnywhere)
+		float SetCastRange;
+private:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

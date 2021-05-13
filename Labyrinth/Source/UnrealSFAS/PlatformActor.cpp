@@ -11,12 +11,13 @@ APlatformActor::APlatformActor()
 	PrimaryActorTick.bCanEverTick = true;
 	ActorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Actor Mesh"));
 	SetRootComponent(ActorMesh);
+	SetCastRange = 200.0f;
 	//ActorMesh->SetupAttachment(RootComponent);
 }
 
 void APlatformActor::CheckLocationLeft()
 {
-	float CastRange = 200.0f;
+	float CastRange = SetCastRange;
 	FVector EndPoint = GetActorLocation()+(GetActorRightVector()*CastRange);
 	FHitResult Hit;
 	TArray<AActor*> ActorsToIgnore;
@@ -38,7 +39,7 @@ void APlatformActor::CheckLocationLeft()
 
 void APlatformActor::CheckLocationRight()
 {
-	float CastRange = -250.0f;
+	float CastRange = -SetCastRange;
 	FVector EndPoint = GetActorLocation() + ((GetActorRightVector()) * CastRange);
 	FHitResult Hit;
 	TArray<AActor*> ActorsToIgnore;
@@ -58,6 +59,49 @@ void APlatformActor::CheckLocationRight()
 	}
 }
 
+void APlatformActor::CheckLocationDown()
+{
+	float CastRange = -SetCastRange;
+	FVector EndPoint = GetActorLocation() + ((GetActorUpVector()) * CastRange);
+	FHitResult Hit;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	bool ObjectInRange = UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), EndPoint, ETraceTypeQuery::TraceTypeQuery2,
+		false, ActorsToIgnore, EDrawDebugTrace::Type::ForDuration, Hit, true, FLinearColor::Red, FLinearColor::Green, 2);
+	if (ObjectInRange)
+	{
+		if (Hit.GetActor()->ActorHasTag("FinalPoint"))
+		{
+			FString ActorName = Hit.GetActor()->GetName();
+			UE_LOG(LogTemp, Warning, TEXT("Hit something: %s"), *ActorName);
+			UE_LOG(LogTemp, Warning, TEXT("Arrived at location!"));
+			MovementSpeed = abs(MovementSpeed);
+			MovingUp = true;
+		}
+	}
+}
+
+void APlatformActor::CheckLocationUp()
+{
+	float CastRange = SetCastRange;
+	FVector EndPoint = GetActorLocation() + ((GetActorUpVector()) * CastRange);
+	FHitResult Hit;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	bool ObjectInRange = UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), EndPoint, ETraceTypeQuery::TraceTypeQuery2,
+		false, ActorsToIgnore, EDrawDebugTrace::Type::ForDuration, Hit, true, FLinearColor::Red, FLinearColor::Green, 2);
+	if (ObjectInRange)
+	{
+		if (Hit.GetActor()->ActorHasTag("FinalPoint"))
+		{
+			FString ActorName = Hit.GetActor()->GetName();
+			UE_LOG(LogTemp, Warning, TEXT("Hit something: %s"), *ActorName);
+			UE_LOG(LogTemp, Warning, TEXT("Arrived at location!"));
+			MovementSpeed = -abs(MovementSpeed);
+			MovingUp = false;
+		}
+	}
+}
 // Called when the game starts or when spawned
 void APlatformActor::BeginPlay()
 {
@@ -69,14 +113,29 @@ void APlatformActor::BeginPlay()
 void APlatformActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AddActorWorldOffset((GetActorRightVector() * MovementSpeed)*DeltaTime);
-	if (MovingLeft)
+	if (MoveSideways)
 	{
-		CheckLocationLeft();
+		AddActorWorldOffset((GetActorRightVector() * MovementSpeed) * DeltaTime);
+		if (MovingLeft)
+		{
+			CheckLocationLeft();
+		}
+		else
+		{
+			CheckLocationRight();
+		}
 	}
-	else
+	else if(!MoveSideways)
 	{
-		CheckLocationRight();
+		AddActorWorldOffset((GetActorUpVector() * MovementSpeed) * DeltaTime);
+		if (MovingUp)
+		{
+			CheckLocationUp();
+		}
+		else
+		{
+			CheckLocationDown();
+		}
 	}
 }
 
