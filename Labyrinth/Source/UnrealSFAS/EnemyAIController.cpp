@@ -5,8 +5,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Engine/TargetPoint.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Actor.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "EnemyAnimInstance.h"
 void AEnemyAIController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -18,15 +20,17 @@ void AEnemyAIController::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("BT Loaded!"));
 	}
 	GetBlackboardComponent()->SetValueAsVector(TEXT("StartLocation"), AIPawn->GetActorLocation());
-
 	EnemyHealth = SetEnemyHealth;
+	
+
 }
 
 void AEnemyAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AActor* Actor = GetPawn();
+
 	
+
 }
 
 

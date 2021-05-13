@@ -9,19 +9,21 @@
 #include "GameFramework/Actor.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
+#include "Kismet/KismetMathLibrary.h"
 void UBTService_IsInFront::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	AActor* Enemy = OwnerComp.GetAIOwner();
 	AActor* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	if (InFront(PlayerPawn, Enemy))
+	bool IsInFront = InFront(PlayerPawn, Enemy);
+	if (IsInFront && PlayerPawn != nullptr)
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(GetSelectedBlackboardKey(), true);
 		OwnerComp.GetBlackboardComponent()->ClearValue(TEXT("NoSight"));
 
 	}
-	else
+	else if (!IsInFront)
 	{
 		OwnerComp.GetBlackboardComponent()->ClearValue(GetSelectedBlackboardKey());
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("NoSight"), true);
@@ -30,13 +32,8 @@ void UBTService_IsInFront::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 
 bool UBTService_IsInFront::InFront(AActor* PlayerPawnIn, AActor* AIPawn)
 {
-	FVector AIForwardVector = AIPawn->GetActorForwardVector();//Normalised
-	FVector PlayerPositionVector = PlayerPawnIn->GetActorLocation();
-	FVector AIPositionVector = AIPawn->GetActorLocation();
-	FVector AIToPlayerVector = PlayerPositionVector - AIPositionVector;
-	AIToPlayerVector.Normalize();
-	float DirectionDotProduct = FVector::DotProduct(AIToPlayerVector, AIForwardVector);
-
-	if (DirectionDotProduct > 0) return true;
-	else return false;
+	
+	float DotProduct = UKismetMathLibrary::Dot_VectorVector(AIPawn->GetActorLocation(), PlayerPawnIn->GetActorLocation());
+	if (DotProduct >= 0) return true;
+	return false;
 }

@@ -64,6 +64,13 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 	ProjectileSpawnPoint->SetupAttachment(GetMesh());
 	CameraDefault = CreateDefaultSubobject<UArrowComponent>(TEXT("CameraDefault"));
 	CameraDefault->SetupAttachment(GetCapsuleComponent());
+	// declare overlap events
+	// declare trigger capsule
+	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
+	TriggerCapsule->InitCapsuleSize(45.0f, 100.0f);;
+	TriggerCapsule->SetCollisionProfileName(TEXT("Trigger"));
+	TriggerCapsule->SetupAttachment(RootComponent);
+
 }
 
 void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
@@ -71,11 +78,12 @@ void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
 	PlayerMovement = State;
 }
 
+
+
+
+
 //////////////////////////////////////////////////////////////////////////
 // Input
-
-
-
 void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -113,7 +121,6 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AUnrealSFASCharacter::OnResetVR);
 
-	PlayerInputComponent->BindAction("ShowPlayerPos", IE_Pressed, this, &AUnrealSFASCharacter::ShowPlayerCoordinates);
 }
 
 void AUnrealSFASCharacter::OnBeginFire()
@@ -134,7 +141,6 @@ void AUnrealSFASCharacter::OnAimBegin()
 	{
 		//Default camera arm position: FVector(370.0f, 35.0f, 65.0f)
 		GetController()->SetControlRotation(CameraDefault->GetComponentRotation());
-
 		FollowCamera->SetRelativeLocation(FVector(370.0f, 35.0f, 65.0f));
 		GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 		PlayerMovement = Aim;
@@ -174,11 +180,17 @@ void AUnrealSFASCharacter::SetRotateAmount(float Value)
 void AUnrealSFASCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	/*Setup character Mesh Hit events*/
+	GetMesh()->SetNotifyRigidBodyCollision(true);
 	AnimationUpdate = Cast<UAnimInstanceBase>(GetMesh()->GetAnimInstance());
-	GetCharacterMovement()->JumpZVelocity = 480.0f;
-	this->OnActorHit.AddDynamic(this, &AUnrealSFASCharacter::OnHit);
-	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AUnrealSFASCharacter::BeginOverlap);
 	PlayerController = Cast<APlayerControllerBase>(GetWorld()->GetFirstPlayerController());
+
+	/*
+	 * Setup player properties from the BP.
+	 */
+	PlayerHealth = SetPlayerHealth;
+	
+	GetCharacterMovement()->JumpZVelocity = 480.0f;
 
 }
 
@@ -244,6 +256,8 @@ void AUnrealSFASCharacter::Landed(const FHitResult& Hit)
 	AnimationUpdate->SetJumpFalse();
 	AnimationUpdate->IsFalling = false;
 }
+
+
 
 
 
@@ -510,22 +524,18 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 
 	}
 }
-void AUnrealSFASCharacter::ShowPlayerCoordinates()
-{
-	//UE_LOG(LogTemp, Warning, TEXT("Player position: %d %f %s"),GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
 
-}
-
-void AUnrealSFASCharacter::OnHit(AActor* HitComponent, AActor* OtherActor,  FVector NormalImpulse, const FHitResult& Hit)
+/*
+ * Handle player health system functions.
+ */
+void AUnrealSFASCharacter::DamagePlayer(int DamageAmount)
 {
-		UE_LOG(LogTemp, Warning, TEXT("Player has been hit!"));
-	if(OtherActor->ActorHasTag("Enemy"))
+	UE_LOG(LogTemp, Warning, TEXT("Player is Hit!"));
+
+	PlayerHealth -= DamageAmount;
+	PlayerController->UpdateHealthStatus(PlayerHealth);
+	if(PlayerHealth<=0)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Player has died!"));
 	}
-}
-
-void AUnrealSFASCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Player has been hit!"));
-
 }

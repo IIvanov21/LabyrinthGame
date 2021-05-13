@@ -9,6 +9,7 @@
 /**
  * 
  */
+class UEnemyAnimInstance;
 UCLASS()
 class UNREALSFAS_API AEnemyAIController : public AAIController
 {
@@ -18,7 +19,7 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	APawn* AIPawn;
+	AActor* AIPawn;
 	APawn* PlayerPawn;
 	int EnemyHealth;
 
@@ -30,6 +31,8 @@ public:
 		int SetEnemyHealth;
 	UPROPERTY(EditAnywhere)
 		int EnemyDamage;
+	UPROPERTY()
+		UEnemyAnimInstance* EnemyAnim;
 	UFUNCTION()
 		void ReduceEnemyHealth(int DamageAmount);
 };

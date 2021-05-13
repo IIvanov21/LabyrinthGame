@@ -88,7 +88,13 @@ public:
 		void UpdateInteraction();
 	UPROPERTY()
 		APawn* InteractedActor;
-
+	/*
+	 * Player health controls.
+	 */
+	UFUNCTION()
+		void DamagePlayer(int DamageAmount);
+	UPROPERTY(EditAnywhere)
+		int SetPlayerHealth;
 	/*
 	 * Providing access to projectile creation from other classes.
 	 */
@@ -129,6 +135,11 @@ private:
 	 */
 	float JumpAnimUpdate=0.0f;
 
+	/*
+	 * Player health.
+	 */
+	int PlayerHealth;
+
 protected:
 
 	//// Called when the game starts or when spawned
@@ -166,16 +177,6 @@ protected:
 	/*Show Player coordinates*/
 	void ShowPlayerCoordinates();
 
-	void OnHit(AActor* HitComponent, AActor* OtherActor,  FVector NormalImpulse, const FHitResult& Hit);
-
-	// Overlap
-	UFUNCTION()
-		void BeginOverlap(UPrimitiveComponent* OverlappedComponent,
-			AActor* OtherActor,
-			UPrimitiveComponent* OtherComp,
-			int32 OtherBodyIndex,
-			bool bFromSweep,
-			const FHitResult& SweepResult);
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -191,5 +192,9 @@ public:
 	virtual void Jump() override;
 	virtual void StopJumping() override;
 	virtual void Landed(const FHitResult& Hit) override;
+
+	UPROPERTY(VisibleAnywhere, Category = "Trigger Capsule")
+		class UCapsuleComponent* TriggerCapsule;
+	
 };
 

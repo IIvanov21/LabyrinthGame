@@ -10,6 +10,7 @@
 class UScoreUserWidget;
 class UTimeUserWidget;
 class UKeyUserWidget;
+class UHealthUserWidget;
 /**
  * 
  */
@@ -22,8 +23,9 @@ public:
 	virtual void BeginPlay() override;
 	void DrawCrosshair(bool Draw);
 	void SetScore(int Points);
-	void  SetTimer(int timeIn);
+	void SetTimer(int timeIn);
 	void SetKey();
+	void UpdateHealthStatus(int Health);
 private:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> MinimapClass;
@@ -56,4 +58,11 @@ private:
 		TSubclassOf<UUserWidget> CrosshairClass;
 	UPROPERTY(EditAnywhere)
 		UUserWidget* CrosshairUI;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UUserWidget> HealthbarClass;
+	UPROPERTY(EditAnywhere)
+		UUserWidget* HealthbarUI;
+	UPROPERTY(EditAnywhere)
+		UHealthUserWidget* HealthHandle;
 };

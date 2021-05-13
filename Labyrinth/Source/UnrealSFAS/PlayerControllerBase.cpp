@@ -6,6 +6,7 @@
 #include "ScoreUserWidget.h"
 #include "TimeUserWidget.h"
 #include "KeyUserWidget.h"
+#include "HealthUserWidget.h"
 
 void APlayerControllerBase::BeginPlay()
 {
@@ -31,6 +32,9 @@ void APlayerControllerBase::BeginPlay()
 	
 	CrosshairUI = CreateWidget(this, CrosshairClass);
 
+	HealthbarUI = CreateWidget(this, HealthbarClass);
+	if (HealthbarUI != nullptr)HealthbarUI->AddToViewport();
+	HealthHandle = Cast<UHealthUserWidget>(HealthbarUI);
 }
 
 
@@ -56,4 +60,9 @@ void APlayerControllerBase::SetTimer(int timeIn)
 void APlayerControllerBase::SetKey()
 {
 	KeySet->KeyCollected();
+}
+
+void APlayerControllerBase::UpdateHealthStatus(int Health)
+{
+	HealthHandle->SetHealth(Health);
 }
