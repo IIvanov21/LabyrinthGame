@@ -7,6 +7,11 @@
 #include "TimeUserWidget.h"
 #include "KeyUserWidget.h"
 #include "HealthUserWidget.h"
+#include "MainGameInstance.h"
+APlayerControllerBase::APlayerControllerBase()
+{
+	
+}
 
 void APlayerControllerBase::BeginPlay()
 {
@@ -16,6 +21,7 @@ void APlayerControllerBase::BeginPlay()
 	MinimapUI = CreateWidget(this, MinimapClass);
 	if (MinimapUI != nullptr)MinimapUI->AddToViewport();
 
+	UE_LOG(LogTemp, Warning, TEXT("Time: %a"), Time);
 	
 	ScoreUI = CreateWidget(this, ScoreClass);
 	if (ScoreUI != nullptr)ScoreUI->AddToViewport();
@@ -25,7 +31,7 @@ void APlayerControllerBase::BeginPlay()
 	TimeUI = CreateWidget(this, TimeClass);
 	if (TimeUI != nullptr)TimeUI->AddToViewport();
 	TimeText = Cast<UTimeUserWidget>(TimeUI);
-
+	
 	KeyUI = CreateWidget(this, KeyClass);
 	if (KeyUI != nullptr)KeyUI->AddToViewport();
 	KeySet = Cast<UKeyUserWidget>(KeyUI);
@@ -49,11 +55,14 @@ void APlayerControllerBase::DrawCrosshair(bool Draw)
 
 void APlayerControllerBase::SetScore(int Points)
 {
+	
 	ScoreText->UpdateScore(Points);
+	
 }
 
 void APlayerControllerBase::SetTimer(int timeIn)
 {
+	
 	TimeText->GetTimer(timeIn);
 }
 
@@ -62,7 +71,8 @@ void APlayerControllerBase::SetKey()
 	KeySet->KeyCollected();
 }
 
-void APlayerControllerBase::UpdateHealthStatus(int Health)
+void APlayerControllerBase::UpdateHealthStatus(int HealthIn)
 {
-	HealthHandle->SetHealth(Health);
+	
+	HealthHandle->SetHealth(HealthIn);
 }

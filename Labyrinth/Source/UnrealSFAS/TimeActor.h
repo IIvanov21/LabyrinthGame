@@ -7,6 +7,7 @@
 #include "TimeActor.generated.h"
 class UTimeUserWidget;
 class APlayerControllerBase;
+class UMainGameInstance;
 UCLASS()
 class UNREALSFAS_API ATimeActor : public AActor
 {
@@ -19,9 +20,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 private:
-	
 	UPROPERTY(EditAnywhere)
-		float TimeCountDown = 600.0f;
+		UMainGameInstance* MainGameInstance;
+	UPROPERTY(EditAnywhere)
+		float TimeCountDown;
 	UPROPERTY(EditAnywhere)
 		APlayerControllerBase* PlayerController;
 public:

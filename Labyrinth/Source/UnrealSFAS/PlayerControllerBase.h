@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "PlayerControllerBase.generated.h"
 
+#include "PlayerControllerBase.generated.h"
 
 class UScoreUserWidget;
 class UTimeUserWidget;
 class UKeyUserWidget;
 class UHealthUserWidget;
+class UMainGameInstance;
 /**
  * 
  */
@@ -20,13 +21,18 @@ class UNREALSFAS_API APlayerControllerBase : public APlayerController
 	GENERATED_BODY()
 
 public:
+	APlayerControllerBase();
 	virtual void BeginPlay() override;
 	void DrawCrosshair(bool Draw);
 	void SetScore(int Points);
 	void SetTimer(int timeIn);
 	void SetKey();
-	void UpdateHealthStatus(int Health);
+	void UpdateHealthStatus(int HealthIn);
+	int GetTimer() { return Time; }
 private:
+	UPROPERTY(EditAnywhere)
+		UMainGameInstance* MainGameInstance;
+	
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> MinimapClass;
 	UPROPERTY(EditAnywhere)
@@ -45,6 +51,8 @@ private:
 		UUserWidget* TimeUI;
 	UPROPERTY(EditAnywhere)
 		UTimeUserWidget* TimeText;
+	UPROPERTY(EditAnywhere)
+		int Time;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> ScoreClass;
@@ -52,7 +60,8 @@ private:
 		UUserWidget* ScoreUI;
 	UPROPERTY(EditAnywhere)
 		UScoreUserWidget* ScoreText;
-
+	UPROPERTY(EditAnywhere)
+		int Score;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> CrosshairClass;
@@ -65,4 +74,6 @@ private:
 		UUserWidget* HealthbarUI;
 	UPROPERTY(EditAnywhere)
 		UHealthUserWidget* HealthHandle;
+	UPROPERTY(EditAnywhere)
+		int Health;
 };

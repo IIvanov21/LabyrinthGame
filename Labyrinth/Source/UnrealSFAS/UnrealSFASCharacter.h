@@ -196,5 +196,6 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Trigger Capsule")
 		class UCapsuleComponent* TriggerCapsule;
 	
+	
 };
 
