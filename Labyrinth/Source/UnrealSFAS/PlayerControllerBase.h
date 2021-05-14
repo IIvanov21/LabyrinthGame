@@ -29,6 +29,7 @@ public:
 	void SetKey();
 	void UpdateHealthStatus(int HealthIn);
 	int GetTimer() { return Time; }
+	
 private:
 	UPROPERTY(EditAnywhere)
 		UMainGameInstance* MainGameInstance;
@@ -68,6 +69,7 @@ private:
 	UPROPERTY(EditAnywhere)
 		UUserWidget* CrosshairUI;
 
+	
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> HealthbarClass;
 	UPROPERTY(EditAnywhere)

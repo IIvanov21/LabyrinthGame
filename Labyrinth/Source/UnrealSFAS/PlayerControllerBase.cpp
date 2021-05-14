@@ -40,6 +40,7 @@ void APlayerControllerBase::BeginPlay()
 	HealthbarUI = CreateWidget(this, HealthbarClass);
 	if (HealthbarUI != nullptr)HealthbarUI->AddToViewport();
 	HealthHandle = Cast<UHealthUserWidget>(HealthbarUI);
+
 }
 
 

@@ -109,6 +109,8 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AUnrealSFASCharacter::Interact);
 	PlayerInputComponent->BindAction("PressedMove", IE_Pressed, this, &AUnrealSFASCharacter::MoveInteractionPressed);
 	PlayerInputComponent->BindAction("PressedMove", IE_Released,this, &AUnrealSFASCharacter::MoveInteractionReleased);
+
+
 	/*Create the projectile itself*/
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AUnrealSFASCharacter::OnBeginFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &AUnrealSFASCharacter::OnEndFire);
@@ -398,6 +400,7 @@ void AUnrealSFASCharacter::CreateProjectile()
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("Failed to get projectile class."));
 }
+
 void AUnrealSFASCharacter::Interact()
 {
 	if (PlayerMovement != Aim)
