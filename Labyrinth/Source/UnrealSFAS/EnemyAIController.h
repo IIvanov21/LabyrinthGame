@@ -19,12 +19,18 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	/*
+	 * Handlers for the needed controllers.
+	 */
 	AActor* AIPawn;
 	APawn* PlayerPawn;
 	int EnemyHealth;
 
 	
 public:
+	/*
+	 * Access to the Enemy AI pawn and animation controls.
+	 */
 	UPROPERTY(EditAnywhere)
 		UBehaviorTree* EnemyBehaviorTree;
 	UPROPERTY(EditAnywhere)

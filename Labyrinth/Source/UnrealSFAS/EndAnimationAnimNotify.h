@@ -7,7 +7,8 @@
 #include "EndAnimationAnimNotify.generated.h"
 
 /**
- * 
+ * Simple notify for the end of an animation.
+ * Can be used for precise animation control events.
  */
 UCLASS()
 class UNREALSFAS_API UEndAnimationAnimNotify : public UAnimNotify

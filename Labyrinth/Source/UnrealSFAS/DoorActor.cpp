@@ -11,6 +11,9 @@ ADoorActor::ADoorActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	IsKeyCollected = false;
+	/*
+	 * Create and setup the mesh for the Door Actor in the main level.
+	 */
 	DoorMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Door Mesh"));
 	SetRootComponent(DoorMesh);
 	DoorMesh->SetupAttachment(RootComponent);
@@ -20,6 +23,9 @@ ADoorActor::ADoorActor()
 void ADoorActor::BeginPlay()
 {
 	Super::BeginPlay();
+	/*
+	 * Add a hit dynamic.
+	 */
 	DoorMesh->OnComponentHit.AddDynamic(this, &ADoorActor::OnCompHit);
 	
 }
@@ -32,7 +38,11 @@ void ADoorActor::Tick(float DeltaTime)
 }
 
 
-
+/*
+ * Hit dynamic that checks if the player is trying to open the door.
+ * If the player has collected all keys the door will open.
+ * Otherwise warn the player keys need to be collected.
+ */
 void ADoorActor::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (OtherActor->GetClass()->IsChildOf(AUnrealSFASCharacter::StaticClass()))
@@ -48,6 +58,9 @@ void ADoorActor::OnCompHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPr
 	}
 }
 
+/*
+ * Checker for the collected keys.
+ */
 void ADoorActor::KeyCollected()
 {
 	IsKeyCollected = !IsKeyCollected;

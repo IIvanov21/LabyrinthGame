@@ -9,6 +9,9 @@
 APortalActor::APortalActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	/*
+	 * Setup Actor mesh and trigger capsules.
+	 */
 	PrimaryActorTick.bCanEverTick = true;
 	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
 	TriggerCapsule->InitCapsuleSize(50.0f, 100.0f);;
@@ -33,7 +36,10 @@ void APortalActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
+/*
+ * Simple overlap event to detect in which level has the Player walked into.
+ */
+ 
 void APortalActor::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->ActorHasTag("Player"))

@@ -27,6 +27,9 @@ public:
 	/** called when something enters the sphere component */
 	UFUNCTION()
 		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	/*
+	 * Trigger capsule used to control the overlap event.
+	 */
 	UPROPERTY(VisibleAnywhere, Category = "Trigger Capsule")
 		class UCapsuleComponent* TriggerCapsule;
 	UPROPERTY(VisibleAnywhere, Category = "Portal Mesh")

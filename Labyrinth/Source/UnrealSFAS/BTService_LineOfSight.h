@@ -7,7 +7,7 @@
 #include "BTService_LineOfSight.generated.h"
 
 /**
- * 
+ * Service to check if the player is in line of sight.
  */
 UCLASS()
 class UNREALSFAS_API UBTService_LineOfSight : public UBTService_BlackboardBase

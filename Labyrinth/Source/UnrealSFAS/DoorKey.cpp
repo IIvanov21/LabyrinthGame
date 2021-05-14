@@ -37,12 +37,16 @@ void ADoorKey::BeginPlay()
 void ADoorKey::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	//Create simple rotation animation for the key.
 	FRotator KeyRotator = FRotator(0.0f, 2.0f, 0.0f);
 	KeyMesh->AddLocalRotation(KeyRotator);
 }
 
 
-
+/*
+ * Check which key has the player collected and update it's state.
+ * Since only three keys are going to be used. Simple variables cost less than array pointers.
+ */
 void ADoorKey::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->GetClass()->IsChildOf(AUnrealSFASCharacter::StaticClass()))
@@ -51,6 +55,9 @@ void ADoorKey::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 		if (this->ActorHasTag("KeyTwo")) MainGameInstance->KeyTwo = true;
 		if (this->ActorHasTag("KeyThree")) MainGameInstance->KeyThree = true;
 
+		/*
+		 * Update key status and destroy the actor on pickup.
+		 */
 		UE_LOG(LogTemp, Warning, TEXT("Key Collected!"));
 		PlayerController->SetKey();
 		AUnrealSFASCharacter* Player = Cast<AUnrealSFASCharacter>(OtherActor);

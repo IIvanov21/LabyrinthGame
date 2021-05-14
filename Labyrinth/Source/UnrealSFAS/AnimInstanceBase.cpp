@@ -64,7 +64,15 @@ void UAnimInstanceBase::SetWalk(bool condition)
 {
 	IsWalking = condition;
 }
-
+/*
+ * Play the given animation montage.
+ * @Animation- string to specify which montage
+ * @State- Set the montage in the given state.
+ * Play - Will check if the montage has started, if not will play the montage.
+ * Pause - Pause montage at it's current frame, if the montage is active.
+ * Resume - Resume the montage from it's current frame, if the montage is active.
+ * Stop - Stop the montage.
+ */
 void UAnimInstanceBase::PlayAnimation(FName Animation, AnimationState State)
 {
 	

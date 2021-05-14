@@ -7,7 +7,7 @@
 #include "TimeUserWidget.generated.h"
 
 /**
- * 
+ * User widget to display Time on Screen.
  */
 UCLASS()
 class UNREALSFAS_API UTimeUserWidget : public UUserWidget

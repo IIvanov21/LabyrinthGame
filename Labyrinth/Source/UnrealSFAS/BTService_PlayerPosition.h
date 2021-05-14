@@ -7,7 +7,7 @@
 #include "BTService_PlayerPosition.generated.h"
 
 /**
- * 
+ * Service to keep track of the player position.
  */
 UCLASS()
 class UNREALSFAS_API UBTService_PlayerPosition : public UBTService_BlackboardBase

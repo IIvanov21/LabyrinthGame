@@ -71,7 +71,9 @@ public:
 
 	UFUNCTION()
 		void Interact();
-
+	/*
+	 * Movement functions.
+	 */
 	UFUNCTION()
 		void MoveInteractionPressed();
 	UFUNCTION()
@@ -118,7 +120,6 @@ private:
 	 * Aim functions
 	 */
 	FVector RelativeRotation;
-
 	void OnAimBegin();
 	void OnAimEnd();
 	void SetRotateAmount(float Value);

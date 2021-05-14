@@ -7,7 +7,7 @@
 #include "BTService_IsAtLocation.generated.h"
 
 /**
- * 
+ * Service for reached location.
  */
 UCLASS()
 class UNREALSFAS_API UBTService_IsAtLocation : public UBTService_BlackboardBase

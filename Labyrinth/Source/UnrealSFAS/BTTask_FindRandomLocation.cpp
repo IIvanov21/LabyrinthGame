@@ -7,7 +7,10 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 
-
+/*
+ * Using the navigation box in the level. Generate a random location for the Enemy AI to patrol to.
+ * This service gets called when the enemy has reached it's last patrol point.
+ */
 EBTNodeResult::Type UBTTask_FindRandomLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	Super::ExecuteTask(OwnerComp, NodeMemory);

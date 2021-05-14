@@ -7,7 +7,7 @@
 #include "BTService_IsInFront.generated.h"
 
 /**
- * 
+ * Service to check if the player is in front.
  */
 UCLASS()
 class UNREALSFAS_API UBTService_IsInFront : public UBTService_BlackboardBase
