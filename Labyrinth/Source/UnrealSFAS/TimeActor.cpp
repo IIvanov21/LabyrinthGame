@@ -4,6 +4,7 @@
 #include "TimeActor.h"
 #include "PlayerControllerBase.h"
 #include "MainGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 // Sets default values
 ATimeActor::ATimeActor()
 {
@@ -27,5 +28,10 @@ void ATimeActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	MainGameInstance->Time = TimeCountDown-GetWorld()->GetTimeSeconds();
 	PlayerController->SetTimer(TimeCountDown - GetWorld()->GetTimeSeconds());
+	if(MainGameInstance->Time<=0.0f)
+	{
+		MainGameInstance->ResetStats();
+		UGameplayStatics::OpenLevel(GetWorld(), "GameOverMenu");
+	}
 }
 

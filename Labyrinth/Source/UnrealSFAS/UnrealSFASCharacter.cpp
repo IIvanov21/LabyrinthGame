@@ -18,7 +18,9 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "PushActor.h"
 #include "ProjectileActor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 //////////////////////////////////////////////////////////////////////////
 // AUnrealSFASCharacter
 
@@ -562,5 +564,7 @@ void AUnrealSFASCharacter::DamagePlayer(int DamageAmount)
 	if(PlayerHealth<=0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player has died!"));
+		MainGameInstance->ResetStats();
+		UGameplayStatics::OpenLevel(GetWorld(), "GameOverMenu");
 	}
 }

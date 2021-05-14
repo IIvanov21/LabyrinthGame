@@ -29,5 +29,6 @@ public:
 		bool KeyThree;
 	UPROPERTY(EditAnywhere)
 		bool KeysCollected;
-
+	UFUNCTION()
+		void ResetStats();
 };

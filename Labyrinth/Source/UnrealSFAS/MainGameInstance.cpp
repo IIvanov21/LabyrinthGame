@@ -15,3 +15,12 @@ UMainGameInstance::UMainGameInstance(const FObjectInitializer& ObjectInitializer
 	KeysCollected = false;
 }
 
+void UMainGameInstance::ResetStats()
+{
+	Time = 600.0f;
+	Health = 100;
+	KeyOne = false;
+	KeyTwo = false;
+	KeyThree = false;
+	KeysCollected = false;
+}
