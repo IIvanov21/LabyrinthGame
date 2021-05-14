@@ -7,7 +7,7 @@
 #include "ScoreUserWidget.generated.h"
 
 /**
- * 
+ * Score UI widget. 
  */
 UCLASS()
 class UNREALSFAS_API UScoreUserWidget : public UUserWidget

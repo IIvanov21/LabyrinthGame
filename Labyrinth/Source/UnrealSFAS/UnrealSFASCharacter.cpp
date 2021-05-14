@@ -77,11 +77,17 @@ AUnrealSFASCharacter::AUnrealSFASCharacter()
 
 }
 
+/*
+ * Update the player state from other classes.
+ */
 void AUnrealSFASCharacter::ChangeState(PlayerMovementState State)
 {
 	PlayerMovement = State;
 }
 
+/*
+ * Update Key and Door states.
+ */
 void AUnrealSFASCharacter::SetDoorKeyState()
 {
 	if(MainGameInstance->KeyOne && MainGameInstance->KeyTwo && MainGameInstance->KeyThree)
@@ -143,6 +149,9 @@ void AUnrealSFASCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 }
 
+/*
+ * Initiate attack animation.
+ */
 void AUnrealSFASCharacter::OnBeginFire()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Fire Pressed!"));
@@ -155,11 +164,18 @@ void AUnrealSFASCharacter::OnEndFire()
 	
 	
 }
+/*
+ * Transition to Aim state
+ * Allow it to only happen while in Walking State
+ */
 void AUnrealSFASCharacter::OnAimBegin()
 {
 	if (PlayerMovement == Walking)
 	{
 		//Default camera arm position: FVector(370.0f, 35.0f, 65.0f)
+		/*
+		 * Reset controller orientation and add a crosshair to the screen while aiming.
+		 */
 		GetController()->SetControlRotation(CameraDefault->GetComponentRotation());
 		FollowCamera->SetRelativeLocation(FVector(370.0f, 35.0f, 65.0f));
 		GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
@@ -171,6 +187,9 @@ void AUnrealSFASCharacter::OnAimBegin()
 	
 
 }
+/*
+ * Reset the player back to normal Walking state.
+ */
 void AUnrealSFASCharacter::OnAimEnd()
 {
 	if (PlayerMovement == Aim)
@@ -185,7 +204,9 @@ void AUnrealSFASCharacter::OnAimEnd()
 		PlayerController->DrawCrosshair(false);
 	}
 }
-
+/*
+ * Make the actor follow the controller rotation while Aiming.
+ */
 void AUnrealSFASCharacter::SetRotateAmount(float Value)
 {
 	if (PlayerMovement == Aim)
@@ -221,8 +242,16 @@ void AUnrealSFASCharacter::BeginPlay()
 void AUnrealSFASCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	/*
+	 * Update UI elements.
+	 */
 	PlayerController->UpdateHealthStatus(PlayerHealth);
 	PlayerController->SetKey();
+	/*
+	 * Check if the player is too far from the Push Actor.
+	 * If the player is too far update to normal walking state.
+	 * This allows to deal with edge detection i.e. if the push actor has fallen from a wall or a platform.
+	 */
 	if (PlayerMovement == Interaction && InteractedActor != nullptr)
 	{
 		float DistanceToObject = UKismetMathLibrary::Vector_Distance(GetActorLocation(), InteractedActor->GetActorLocation());
@@ -233,6 +262,10 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 	}
 	else if (PlayerMovement == Walking)
 	{
+		/*
+		 * Simple jump timer to allow the full jump animation to play
+		 * before transitioning to Fall animation.
+		 */
 		if (JumpAnimUpdate > 0.0f)JumpAnimUpdate -= DeltaTime;
 		if (GetCharacterMovement()->IsFalling() && JumpAnimUpdate <= 0.0f)
 		{
@@ -241,6 +274,9 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 	}
 	else if (PlayerMovement == Aim)
 	{
+		/*
+		 * Create a raycast to get a vector location which the projectile that will be shot towards to.
+		 */
 		AController* ControllerRef = GetController();
 		FVector CameraLocation;
 		FRotator CameraRotation;
@@ -249,12 +285,17 @@ void AUnrealSFASCharacter::Tick(float DeltaTime)
 		FVector EndPoint = CameraLocation + CameraRotation.Vector() * CastRange;
 		FHitResult Hit;
 		GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);
+		/*
+		 * Make the projectile fly towards where the player was aiming.
+		 */
 		ProjectileSpawnPoint->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(ProjectileSpawnPoint->GetComponentLocation(), Hit.TraceEnd));
 		
 	}
 
 }
-
+/*
+ * Play the jump animation when it's initiated.
+ */
 void AUnrealSFASCharacter::Jump()
 {
 	if (PlayerMovement == Walking)
@@ -264,7 +305,9 @@ void AUnrealSFASCharacter::Jump()
 		AnimationUpdate->SetJumpTrue();
 	}
 }
-
+/*
+ * Allow to play fall animation while in the air.
+ */
 void AUnrealSFASCharacter::StopJumping()
 {
 	if (PlayerMovement == Walking)
@@ -274,7 +317,9 @@ void AUnrealSFASCharacter::StopJumping()
 }
 
 
-
+/*
+ * Update the jump animation when the player has landed.
+ */
 void AUnrealSFASCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
@@ -285,7 +330,9 @@ void AUnrealSFASCharacter::Landed(const FHitResult& Hit)
 
 
 
-
+/*
+ * Allow the push actor to be pushed in only one direction.
+ */
 void AUnrealSFASCharacter::MoveInteractionPressed()
 {
 	
@@ -296,16 +343,24 @@ void AUnrealSFASCharacter::MoveInteractionReleased()
 	MovingRight = true;
 	MovingForwards = true;
 }
-
+/*
+ * Update the Push/Pull animations correctly
+ */
 void AUnrealSFASCharacter::PlayPushPullForwards(float Value)
 {
 	if (PlayerMovement==Interaction)
 	{
+		/*
+		 * Pause the animations while the player is idle.
+		 */
 		if (Value == 0.0f)
 		{
 			AnimationUpdate->PlayAnimation("Pull", Pause);
 			AnimationUpdate->PlayAnimation("Push", Pause);
 		}
+		/*
+		 * Play Push animation
+		 */
 		else if (Value > 0.0f)
 		{
 			AnimationUpdate->SetWalk(false);
@@ -314,6 +369,9 @@ void AUnrealSFASCharacter::PlayPushPullForwards(float Value)
 			AnimationUpdate->PlayAnimation("Pull", Stop);
 
 		}
+		/*
+		 * Play Pull animation
+		 */
 		else if (Value < 0.0f)
 		{
 			AnimationUpdate->SetWalk(false);
@@ -327,7 +385,7 @@ void AUnrealSFASCharacter::PlayPushPullForwards(float Value)
 
 	}
 	else
-	{
+	{//Reset back to normal walking animation state.
 		AnimationUpdate->SetWalk(true);
 	}
 }
@@ -335,11 +393,17 @@ void AUnrealSFASCharacter::PlayPushPullRight(float Value)
 {
 	if (PlayerMovement == Interaction)
 	{
+		/*
+		 * Pause animations.
+		 */
 		if (Value == 0.0f)
 		{
 			AnimationUpdate->AnimPlayRate = 0.0f;
 
 		}
+		/*
+		 * Play Push right animation
+		 */
 		else if (Value > 0.0f)
 		{
 			AnimationUpdate->SetWalk(false);
@@ -348,6 +412,9 @@ void AUnrealSFASCharacter::PlayPushPullRight(float Value)
 			AnimationUpdate->IsPushingRight = true;
 			AnimationUpdate->IsPushing = true;
 		}
+		/*
+		 * Play push left animation.
+		 */
 		else if (Value < 0.0f)
 		{
 			AnimationUpdate->SetWalk(false);
@@ -360,11 +427,14 @@ void AUnrealSFASCharacter::PlayPushPullRight(float Value)
 
 	}
 	else
-	{
+	{//Reset back to normal walking animation state.
 		AnimationUpdate->SetWalk(true);
 	}
 }
 
+/*
+ * Make the push actor follow the player movement correctly.
+ */
 void AUnrealSFASCharacter::PushActorForwards(float Value)
 {
 	FString ActorName = InteractedActor->GetName();
@@ -381,6 +451,10 @@ void AUnrealSFASCharacter::PushActorRight(float Value)
 	InteractedActor->AddActorWorldOffset(((GetActorRightVector() * GetVelocity().Size()) * Value)*GetWorld()->DeltaTimeSeconds);
 	if(Value!=0.0f)MovingForwards = false;
 }
+
+/*
+ * Reset player movement to default walk state.
+ */
 void AUnrealSFASCharacter::UpdateInteraction()
 {
 	PlayerMovement = Walking;
@@ -391,6 +465,10 @@ void AUnrealSFASCharacter::UpdateInteraction()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f);
 	if (InteractedActor != nullptr)InteractedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
+
+/*
+ * Create a projectile when the player initates attack state.
+ */
 void AUnrealSFASCharacter::CreateProjectile()
 {
 	if (ProjectileClass)
@@ -403,9 +481,12 @@ void AUnrealSFASCharacter::CreateProjectile()
 	else UE_LOG(LogTemp, Warning, TEXT("Failed to get projectile class."));
 }
 
+/*
+ * Simple raycast to check if the player is close enough to an interact object.
+ */
 void AUnrealSFASCharacter::Interact()
 {
-	if (PlayerMovement != Aim)
+	if (PlayerMovement != Aim)//Allow check if only in walk state
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Pressing Interact."));
 
@@ -417,6 +498,9 @@ void AUnrealSFASCharacter::Interact()
 		{
 			if (Hit.GetActor()->ActorHasTag("Interact"))
 			{
+				/*
+				 * Prepare movement system for interaction and attack the Push actor to the player.
+				 */
 				UE_LOG(LogTemp, Warning, TEXT("You can interact with this actor."));
 				PlayPushPullRight(0);
 				PlayPushPullForwards(0);
@@ -432,6 +516,9 @@ void AUnrealSFASCharacter::Interact()
 		}
 		else
 		{
+			/*
+			 * Reset player movement back to default moving system.
+			 */
 			UpdateInteraction();
 
 
@@ -473,7 +560,10 @@ void AUnrealSFASCharacter::LookUpAtRate(float Rate)
 
 void AUnrealSFASCharacter::MoveForward(float Value)
 {
-	
+	/*
+	 * Default movement allows the player movement
+	 * to follow the camera orientation.
+	 */
 	if (PlayerMovement == Walking)
 	{
 
@@ -491,6 +581,11 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 		}
 	
 	}
+	/*
+	 * If the player has interacted with an object.
+	 * The movement system will ignore the camera and allow the player to move only
+	 * forwards and sideways.
+	 */
 	else if(PlayerMovement == Interaction && MovingForwards )
 	{
 		
@@ -500,6 +595,9 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 	
 
 	}
+	/*
+	 * While the player is Aim the movement starts to include strafing with A and D keys.
+	 */
 	else if (PlayerMovement == Aim)
 	{
 
@@ -518,7 +616,10 @@ void AUnrealSFASCharacter::MoveForward(float Value)
 void AUnrealSFASCharacter::MoveRight(float Value)
 {
 	
-
+	/*
+	 * Default movement allows the player movement
+	 * to follow the camera orientation. 
+	 */
 	if (PlayerMovement == Walking)
 	{
 		if ((Controller != NULL) && (Value != 0.0f))
@@ -535,13 +636,22 @@ void AUnrealSFASCharacter::MoveRight(float Value)
 		}
 		
 	}
+	/*
+	 * If the player has interacted with an object.
+	 * The movement system will ignore the camera and allow the player to move only
+	 * forwards and sideways.
+	 */
 	else if(PlayerMovement == Interaction && MovingRight)
 	{
+		
 		PushActorRight(Value);
 		if (AnimationUpdate->IsPushing)AddMovementInput(GetActorRightVector()*Value, 0.1f);
 		PlayPushPullRight(Value);
 		
 	}
+	/*
+	 * While the player is Aim the movement starts to include strafing with A and D keys.
+	 */
 	else if (PlayerMovement == Aim)
 	{
 
@@ -561,6 +671,9 @@ void AUnrealSFASCharacter::DamagePlayer(int DamageAmount)
 	PlayerHealth -= DamageAmount;
 	MainGameInstance->Health -= DamageAmount;
 	PlayerController->UpdateHealthStatus(MainGameInstance->Health);
+	/*
+	 * Open Game over level if the player dies.
+	 */
 	if(PlayerHealth<=0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Player has died!"));

@@ -6,7 +6,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-
+/*
+ * Check if the enemy has line of sight to the player and update the boolean value
+ * in the behaviour tree.
+ */
 void UBTService_LineOfSight::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);

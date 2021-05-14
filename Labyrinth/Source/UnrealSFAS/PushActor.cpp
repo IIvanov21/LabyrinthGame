@@ -27,7 +27,15 @@ void APushActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
+/*
+ * Get's all the sockets attached to the actor mesh and checks which
+ * is the closest to the Player.
+ * This helps to get correct orientation and position for the actor when
+ * it get's attached to the player.
+ */
+/*
+ * Gets Rotation
+ */
 FRotator APushActor::GetOrientation(FVector ActorLocation)
 {
 	
@@ -47,7 +55,9 @@ FRotator APushActor::GetOrientation(FVector ActorLocation)
 
 	return Sockets[0].Rotator();
 }
-
+/*
+ * Get's location.
+ */
 FVector APushActor::GetLocation(FVector ActorLocation)
 {
 	TArray<FName>SocketNames = ActorMesh->GetAllSocketNames();

@@ -25,6 +25,9 @@ private:
 		APlayerControllerBase* PlayerController;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	/*
+	 * Overlap events to detect if the player has picked the key up.
+	 */
 	UFUNCTION()
 		void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	UFUNCTION()

@@ -39,6 +39,9 @@ public:
 	// declare on hit
 	UFUNCTION()
 		void OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult);
+	/*
+	 * Timers and controllers for precise Enemy attack system.
+	 */
 	UPROPERTY()
 		float AttackTimer = 0.0f;
 	UPROPERTY(EditAnywhere)

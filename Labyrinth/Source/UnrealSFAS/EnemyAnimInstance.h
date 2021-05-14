@@ -7,7 +7,8 @@
 #include "EnemyAnimInstance.generated.h"
 
 /**
- * 
+ * Controller for the Enemy Animation.
+ * Allows to control Enemy Animation States with reference in Notify anims.
  */
 UCLASS()
 class UNREALSFAS_API UEnemyAnimInstance : public UAnimInstance
@@ -15,6 +16,9 @@ class UNREALSFAS_API UEnemyAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 public:
 	UEnemyAnimInstance();
+	/*
+	 * Simple attack callers.
+	 */
 	UFUNCTION()
 		void SetAttack(bool condition) { IsAttacking = condition; }
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

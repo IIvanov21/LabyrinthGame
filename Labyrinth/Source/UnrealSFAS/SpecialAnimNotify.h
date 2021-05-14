@@ -7,7 +7,7 @@
 #include "SpecialAnimNotify.generated.h"
 
 /**
- * 
+ * Notification that gets executed while the player is attacking.
  */
 UCLASS()
 class UNREALSFAS_API USpecialAnimNotify : public UAnimNotify

@@ -7,7 +7,7 @@
 #include "KeyUserWidget.generated.h"
 
 /**
- * 
+ * User widget to display the collected keys from each portal.
  */
 class UMainGameInstance;
 UCLASS()

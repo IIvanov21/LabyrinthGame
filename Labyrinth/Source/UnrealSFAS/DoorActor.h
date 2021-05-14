@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "DoorActor.generated.h"
-
+/*
+ * Door actor for the main level.
+ */
 class USkeletalMeshComponent;
 UCLASS()
 class UNREALSFAS_API ADoorActor : public AActor

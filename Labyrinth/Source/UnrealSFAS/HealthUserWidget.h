@@ -7,7 +7,7 @@
 #include "HealthUserWidget.generated.h"
 
 /**
- * 
+ * User widget for the Health bar
  */
 UCLASS()
 class UNREALSFAS_API UHealthUserWidget : public UUserWidget

@@ -4,7 +4,9 @@
 #include "TimeUserWidget.h"
 
 
-
+/*
+ * Display time on the screen in the given text format.
+ */
 void UTimeUserWidget::GetTimer(int timerIn)
 {
 	Minutes = timerIn / 60;

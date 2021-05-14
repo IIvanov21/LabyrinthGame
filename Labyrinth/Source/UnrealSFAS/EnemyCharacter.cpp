@@ -27,7 +27,10 @@ void AEnemyCharacter::BeginPlay()
 void AEnemyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+	/*
+	 * Ray cast infront of the enemy to check if the player
+	 * is close enough to initiate an attack.
+	 */
 	FVector EndPoint = GetActorLocation()+GetActorForwardVector() * 100.0f;
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
@@ -36,18 +39,24 @@ void AEnemyCharacter::Tick(float DeltaTime)
 		false, ActorsToIgnore, EDrawDebugTrace::Type::ForDuration, Hit, true, FLinearColor::Red, FLinearColor::Green, 2);
 	if (EnemyAnim != nullptr)
 	{
+		/*
+		 * If player is close attack.
+		 */
 		if (Hit.GetActor() != nullptr && Hit.GetActor()->ActorHasTag("Player"))
 		{
 			EnemyAnim->SetAttack(true);
 			IsEnemyAttacking = true;
 		}
-		else 
+		else //Do not attack
 		{
 			EnemyAnim->SetAttack(false);
 			IsEnemyAttacking = false;
 		}
 	}
 	else UE_LOG(LogTemp, Warning, TEXT("Enemy Anim is nullptr"));
+	/*
+	 * Timer to help Avoid applying damage to the player multiple times in a single attack.
+	 */
 	if (AttackTimer >= 0.0f)AttackTimer -= DeltaTime;
 }
 
@@ -60,6 +69,9 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AEnemyCharacter::OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult)
 {
+	/*
+	 * Apply the damage to the player if it has been hit and reset the attack timer.
+	 */
 	if (OtherActor->ActorHasTag("Player") && AttackTimer <= 0.0f && IsEnemyAttacking)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Enemy Comp Hit"));

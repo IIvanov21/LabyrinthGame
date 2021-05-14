@@ -7,7 +7,7 @@
 #include "ChangeStateAnimNotify.generated.h"
 
 /**
- * 
+ * Anim notification to switch Player State at precise animation frame.
  */
 UCLASS()
 class UNREALSFAS_API UChangeStateAnimNotify : public UAnimNotify

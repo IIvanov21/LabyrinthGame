@@ -8,6 +8,9 @@
 APlatformActor::APlatformActor()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	/*
+	 * Setup a simple mesh for the platform actor.
+	 */
 	PrimaryActorTick.bCanEverTick = true;
 	ActorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Actor Mesh"));
 	SetRootComponent(ActorMesh);
@@ -15,6 +18,9 @@ APlatformActor::APlatformActor()
 	//ActorMesh->SetupAttachment(RootComponent);
 }
 
+/*
+ * Check if the platform has reached its location when moving left.
+ */
 void APlatformActor::CheckLocationLeft()
 {
 	float CastRange = SetCastRange;
@@ -24,6 +30,10 @@ void APlatformActor::CheckLocationLeft()
 	ActorsToIgnore.Add(this);
 	bool ObjectInRange=UKismetSystemLibrary::LineTraceSingle(GetWorld(), GetActorLocation(), EndPoint, ETraceTypeQuery::TraceTypeQuery2,
 		false, ActorsToIgnore,EDrawDebugTrace::Type::ForDuration, Hit, true, FLinearColor::Transparent, FLinearColor::Transparent, 2);
+	/*
+	 * The ray cast allows to avoid creating extra actors that need to be attached to the platform for checks.
+	 * Simple if the platform hits an actor with the given Tag it will switch location.
+	 */
 	if (ObjectInRange)
 	{
 		if (Hit.GetActor()->ActorHasTag("FinalPoint"))
@@ -36,7 +46,9 @@ void APlatformActor::CheckLocationLeft()
 		}
 	}
 }
-
+/*
+ * Check if the platform has reached its location when moving right.
+ */
 void APlatformActor::CheckLocationRight()
 {
 	float CastRange = -SetCastRange;
@@ -58,7 +70,9 @@ void APlatformActor::CheckLocationRight()
 		}
 	}
 }
-
+/*
+ * Check if the platform has reached its location when moving down.
+ */
 void APlatformActor::CheckLocationDown()
 {
 	float CastRange = -SetCastRange;
@@ -80,7 +94,9 @@ void APlatformActor::CheckLocationDown()
 		}
 	}
 }
-
+/*
+ * Check if the platform has reached its location when moving up.
+ */
 void APlatformActor::CheckLocationUp()
 {
 	float CastRange = SetCastRange;
@@ -113,6 +129,9 @@ void APlatformActor::BeginPlay()
 void APlatformActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	/*
+	 * A simple check system if you want the platform to move Up/Down or Right/Left.
+	 */
 	if (MoveSideways)
 	{
 		AddActorWorldOffset((GetActorRightVector() * MovementSpeed) * DeltaTime);

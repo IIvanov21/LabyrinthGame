@@ -23,6 +23,9 @@ class UNREALSFAS_API APlayerControllerBase : public APlayerController
 public:
 	APlayerControllerBase();
 	virtual void BeginPlay() override;
+	/*
+	 * Functions to update UI elements.
+	 */
 	void DrawCrosshair(bool Draw);
 	void SetScore(int Points);
 	void SetTimer(int timeIn);
@@ -31,9 +34,15 @@ public:
 	int GetTimer() { return Time; }
 	
 private:
+	/*
+	 * Reference to GameInstance class. To update UI elements.
+	 */
 	UPROPERTY(EditAnywhere)
 		UMainGameInstance* MainGameInstance;
-	
+
+	/*
+	 * Controls for the UI elements.
+	 */
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UUserWidget> MinimapClass;
 	UPROPERTY(EditAnywhere)

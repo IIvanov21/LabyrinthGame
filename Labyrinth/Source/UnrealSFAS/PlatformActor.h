@@ -25,14 +25,20 @@ public:
 		void CheckLocationUp();
 	UFUNCTION()
 		void CheckLocationDown();
+	/*
+	 * Switches for direction of the platform.
+	 */
 	UPROPERTY(EditAnywhere)
 		bool MovingLeft = true;
 	UPROPERTY(EditAnywhere)
 		bool MovingUp = true;
 	UPROPERTY(EditAnywhere)
-	float MovementSpeed = 30.0f;
-	UPROPERTY(EditAnywhere)
 		bool MoveSideways=true;
+	/*
+	 * Control variables for platform speed and range.
+	 */
+	UPROPERTY(EditAnywhere)
+	float MovementSpeed = 30.0f;
 	UPROPERTY(EditAnywhere)
 		float SetCastRange;
 private:

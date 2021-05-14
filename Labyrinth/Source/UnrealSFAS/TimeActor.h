@@ -8,6 +8,9 @@
 class UTimeUserWidget;
 class APlayerControllerBase;
 class UMainGameInstance;
+/*
+ * Time manager actor used to update time displayed in the UI system.
+ */
 UCLASS()
 class UNREALSFAS_API ATimeActor : public AActor
 {

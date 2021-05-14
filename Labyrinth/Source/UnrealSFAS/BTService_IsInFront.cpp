@@ -10,6 +10,10 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
 #include "Kismet/KismetMathLibrary.h"
+/*
+ * Calculate a dot product to check if the player is in front of the enemy.
+ * If true Update enemy behaviour in the behaviour tree.
+ */
 void UBTService_IsInFront::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
@@ -29,7 +33,9 @@ void UBTService_IsInFront::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* No
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(TEXT("NoSight"), true);
 	}
 }
-
+/*
+ * Calculate the dot product.
+ */
 bool UBTService_IsInFront::InFront(AActor* PlayerPawnIn, AActor* AIPawn)
 {
 	

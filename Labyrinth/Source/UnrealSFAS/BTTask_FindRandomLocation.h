@@ -7,7 +7,7 @@
 #include "BTTask_FindRandomLocation.generated.h"
 
 /**
- * 
+ * Service to generate Random Patrol Point.
  */
 UCLASS()
 class UNREALSFAS_API UBTTask_FindRandomLocation : public UBTTask_BlackboardBase

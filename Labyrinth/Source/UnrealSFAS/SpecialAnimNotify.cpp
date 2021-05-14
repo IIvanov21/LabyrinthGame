@@ -4,6 +4,9 @@
 #include "SpecialAnimNotify.h"
 #include "AnimInstanceBase.h"
 #include "UnrealSFASCharacter.h"
+/*
+ * Allows to create projectile at the correct animation frame.
+ */
 void USpecialAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
 	// print method name to screen

@@ -9,6 +9,10 @@
 #include "GameFramework/Actor.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "EnemyAnimInstance.h"
+/*
+ * Setup the enemy character control variables and get access to
+ * the Player character.
+ */
 void AEnemyAIController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -34,7 +38,10 @@ void AEnemyAIController::Tick(float DeltaTime)
 }
 
 
-
+/*
+ * If the enemy has been hurt by the player reduce it's health or
+ * destroy the controller and pawn reference.
+ */
 void AEnemyAIController::ReduceEnemyHealth(int DamageAmount)
 {
 	EnemyHealth -= DamageAmount;
