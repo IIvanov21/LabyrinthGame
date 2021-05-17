@@ -490,7 +490,7 @@ void AUnrealSFASCharacter::Interact()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Pressing Interact."));
 
-		float CastRange = 50.0f;
+		float CastRange = 80.0f;
 		FVector EndPoint = GetActorLocation() + GetActorRotation().Vector() * CastRange;
 		FHitResult Hit;
 		bool ObjectInRange = GetWorld()->LineTraceSingleByChannel(Hit, GetActorLocation(), EndPoint, ECC_Visibility);

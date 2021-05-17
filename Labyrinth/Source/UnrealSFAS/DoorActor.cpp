@@ -15,8 +15,8 @@ ADoorActor::ADoorActor()
 	 * Create and setup the mesh for the Door Actor in the main level.
 	 */
 	DoorMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Door Mesh"));
-	SetRootComponent(DoorMesh);
 	DoorMesh->SetupAttachment(RootComponent);
+	SetRootComponent(DoorMesh);
 }
 
 // Called when the game starts or when spawned

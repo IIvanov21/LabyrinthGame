@@ -14,7 +14,7 @@ class UNREALSFAS_API APushActor : public APawn
 public:	
 	// Sets default values for this actor's properties
 	APushActor();
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	UStaticMeshComponent* ActorMesh;
 protected:
 	// Called when the game starts or when spawned
@@ -28,5 +28,6 @@ public:
 		FRotator GetOrientation(FVector ActorLocation);
 	UFUNCTION()
 		FVector GetLocation(FVector ActorLocation);
-
+	UFUNCTION()
+		void OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult);
 };

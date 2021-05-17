@@ -18,7 +18,7 @@ APushActor::APushActor()
 void APushActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	ActorMesh->OnComponentHit.AddDynamic(this, &APushActor::OnCompHit);
 }
 
 // Called every frame
@@ -77,3 +77,24 @@ FVector APushActor::GetLocation(FVector ActorLocation)
 	return Sockets[0].GetLocation();
 }
 
+void APushActor::OnCompHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& HitResult)
+{
+	if(OtherActor->ActorHasTag("Projectile"))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Interact hit!"));
+		if(this->ActorHasTag("LevelOne"))
+		{
+			ActorMesh->SetVisibility(true);
+			ActorMesh->SetMobility(EComponentMobility::Movable);
+			AddActorWorldOffset(FVector(0.0f,50.0f,0.0f));
+			ActorMesh->SetSimulatePhysics(true);
+		}
+		if (this->ActorHasTag("LevelTwo"))
+		{
+			ActorMesh->SetVisibility(true);
+			ActorMesh->SetMobility(EComponentMobility::Movable);
+			AddActorWorldOffset(FVector(-50.0f, 0.0f, 0.0f));
+			ActorMesh->SetSimulatePhysics(true);
+		}
+	}
+}

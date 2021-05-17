@@ -8,17 +8,5 @@
  */
 void UChangeStateAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
 {
-	TArray<FAnimNotifyTrack> Tracks = Animation->AnimNotifyTracks;
-	AUnrealSFASCharacter* Character = Cast<AUnrealSFASCharacter>(MeshComp->GetOwner());
-	for (auto track : Tracks)
-	{
-		if (track.TrackName == "Idle")
-		{
-			Character->ChangeState(Idle);
-		}
-		else
-		{
-			Character->ChangeState(Walking);
-		}
-	}
+	
 }

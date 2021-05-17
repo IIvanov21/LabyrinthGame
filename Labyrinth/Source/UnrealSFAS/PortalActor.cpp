@@ -16,8 +16,8 @@ APortalActor::APortalActor()
 	TriggerCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Trigger Capsule"));
 	TriggerCapsule->InitCapsuleSize(50.0f, 100.0f);;
 	TriggerCapsule->SetCollisionProfileName(TEXT("Trigger"));
-	SetRootComponent(TriggerCapsule);
 	TriggerCapsule->SetupAttachment(RootComponent);
+	SetRootComponent(TriggerCapsule);
 	ActorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Actor Mesh"));
 	ActorMesh->SetupAttachment(RootComponent);
 

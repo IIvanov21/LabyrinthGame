@@ -7,7 +7,7 @@
 UMainGameInstance::UMainGameInstance(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
 	
-	Time = 600.0f;
+	Time = 1200.0f;
 	Health = 100;
 	KeyOne = false;
 	KeyTwo = false;
@@ -17,7 +17,7 @@ UMainGameInstance::UMainGameInstance(const FObjectInitializer& ObjectInitializer
 
 void UMainGameInstance::ResetStats()
 {
-	Time = 600.0f;
+	Time = 1200.0f;
 	Health = 100;
 	KeyOne = false;
 	KeyTwo = false;
